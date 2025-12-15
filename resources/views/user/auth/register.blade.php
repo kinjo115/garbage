@@ -35,7 +35,8 @@
                     <p>ドメイン等で受信拒否設定されている場合は解除してください。</p>
                     <p>メールの設定については、お使いのプロバイダなどのメールアドレス提供事業者にお問い合わせください。</p>
                 </div>
-                <form action="" class="mt-16">
+                <form action="{{ route('user.register.store') }}" method="POST" class="mt-16">
+                    @csrf
                     <div class="form-group">
                         <div class="flex gap-10">
                             <label for="email" class="form-label required">メールアドレス</label> <span
@@ -52,13 +53,13 @@
                     </div>
                     <div class="privacy-policy">
                         <div>
-                            <input type="checkbox" name="privacy-policy" id="privacy-policy" class="privacy-policy-input">
-                            <label for="privacy-policy">
+                            <input type="checkbox" name="privacy_policy" id="privacy_policy" class="privacy-policy-input">
+                            <label for="privacy_policy">
                                 <span>サイトの利用規約を読んで同意しました <span class="text-E20000">*</span></span>
                             </label>
                         </div>
                         <div class="form-input-error">
-                            @error('privacy-policy')
+                            @error('privacy_policy')
                                 <p class="text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
@@ -71,7 +72,6 @@
                     既にアカウントをお持ちの方は<a href="{{ route('user.login') }}" class="text-ED4141 text-underline">こちら</a>
                 </div>
             </div>
-
         </div>
     </div>
     </div>

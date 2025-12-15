@@ -53,23 +53,21 @@
     @endif
 
     @if ($errors->any())
-        @foreach ($errors->all() as $error)
-            <script>
-                Toastify({
-                    text: "{{ $error }}",
-                    duration: 3000,
-                    newWindow: true,
-                    close: true,
-                    gravity: "bottom", // `top` or `bottom`
-                    position: "right", // `left`, `center` or `right`
-                    stopOnFocus: true, // Prevents dismissing of toast on hover
-                    style: {
-                        background: "linear-gradient(to right, #ff0000, #ff6666)",
-                    },
-                    onClick: function() {} // Callback after click
-                }).showToast();
-            </script>
-        @endforeach
+        <script>
+            Toastify({
+                text: "エラーが発生しました。",
+                duration: 3000,
+                newWindow: true,
+                close: true,
+                gravity: "bottom", // `top` or `bottom`
+                position: "right", // `left`, `center` or `right`
+                stopOnFocus: true, // Prevents dismissing of toast on hover
+                style: {
+                    background: "linear-gradient(to right, #ff0000, #ff6666)",
+                },
+                onClick: function() {} // Callback after click
+            }).showToast();
+        </script>
     @endif
 </body>
 

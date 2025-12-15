@@ -24,7 +24,7 @@ class AuthenticationController extends Controller
             return redirect()->route('home');
         }
 
-        return redirect()->route('login')->with('error', 'Invalid credentials');
+        return redirect()->route('user.login')->with('error', __('auth.failed'));
     }
 
     public function createRegister()
@@ -35,9 +35,8 @@ class AuthenticationController extends Controller
     public function storeRegister(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'email' => 'required|email',
-            'password' => 'required',
+            'email' => 'required|email|unique:users,email',
+            'privacy_policy' => 'required',
         ]);
     }
 }
