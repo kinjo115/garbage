@@ -29,9 +29,10 @@
 </head>
 
 <body>
-    @include('layout.header')
+    @include('layouts.header')
+    @include('layouts.top-navigation')
     @yield('content')
-    @include('layout.footer')
+    @include('layouts.footer')
 
     @if (session('success'))
         <script>

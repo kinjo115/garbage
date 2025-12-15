@@ -6,6 +6,8 @@ body {
     margin: 0;
     translate: 0.5s all;
     font-family: "Noto Sans JP", sans-serif;
+    font-size: 16px;
+    color: #151A1D;
 }
 
 ul {
@@ -38,4 +40,12 @@ p {
     max-width: 1240px;
     margin: auto;
     padding: 0px 20px;
+}
+
+.c-page {
+    padding: 80px 0px 120px 0px;
+}
+
+.text-underline {
+    text-decoration: underline !important;
 }

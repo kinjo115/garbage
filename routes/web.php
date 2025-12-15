@@ -7,8 +7,17 @@ use App\Livewire\Settings\TwoFactor;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\User\AuthenticationController as UserAuthenticationController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::prefix('user')->name('user.')->middleware('guest')->group(function () {
+    Route::get('login', [UserAuthenticationController::class, 'create'])->name('login');
+    Route::post('login', [UserAuthenticationController::class, 'store'])->name('login.store');
+
+    Route::get('register', [UserAuthenticationController::class, 'createRegister'])->name('register');
+    Route::post('register', [UserAuthenticationController::class, 'storeRegister'])->name('register.store');
+});
 
 // Route::view('dashboard', 'dashboard')
 //     ->middleware(['auth', 'verified'])
