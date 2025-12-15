@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 use App\Jobs\SendMessageJob;
+use App\Models\TempUser;
+use Carbon\Carbon;
 
 class AuthenticationController extends Controller
 {
@@ -44,32 +44,47 @@ class AuthenticationController extends Controller
             'privacy_policy' => 'required',
         ]);
 
-        $password = Str::lower(Str::random(10));
 
         try {
             DB::beginTransaction();
 
-            $user = User::create([
-                'name' => explode('@', $request->email)[0],
+            $tempUser = TempUser::create([
                 'email' => $request->email,
-                'password' => Hash::make($password),
+                'token' => Str::lower(Str::random(64)),
+                'expires_at' => Carbon::now()->addHours(24)->toDateTimeString(),
+                'status' => 0,
             ]);
 
             // Dispatch job after transaction commits (Laravel 12 best practice)
-            SendMessageJob::dispatch($user->email, '新規申込みの受付が完了しました', 'mails.user.auth.register.mail', [
-                'email' => $user->email,
-                'password' => $password,
+            SendMessageJob::dispatch($tempUser->email, '新規申込みの受付が完了しました', 'mails.user.auth.register.mail', [
+                'email' => $tempUser->email,
+                'token' => $tempUser->token,
+                'expires_at' => $tempUser->expires_at,
             ])->afterCommit();
 
             DB::commit();
 
-            return redirect()->route('user.register')
-                ->with('success', __('messages.register_success'));
+            return view('user.auth.register_created', compact('tempUser'))->with('success', __('messages.register_created'));
         } catch (\Exception $e) {
             DB::rollBack();
 
             return redirect()->route('user.register')
                 ->with('error', __('messages.register_failed'));
         }
+    }
+
+    public function confirmRegisterCreate($token)
+    {
+        $tempUser = TempUser::where('token', $token)->where('expires_at', '>', now())->where('status', 0)->first();
+
+        if (!$tempUser) {
+            return abort(404);
+        }
+
+        // $tempUser->update([
+        //     'status' => 1,
+        // ]);
+
+        return view('user.auth.register_confirmed', compact('tempUser'));
     }
 }

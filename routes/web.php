@@ -17,6 +17,8 @@ Route::prefix('user')->name('user.')->middleware('guest')->group(function () {
 
     Route::get('register', [UserAuthenticationController::class, 'createRegister'])->name('register');
     Route::post('register', [UserAuthenticationController::class, 'storeRegister'])->name('register.store');
+
+    Route::get('register/token/{token}', [UserAuthenticationController::class, 'confirmRegisterCreate'])->name('register.confirm');
 });
 
 // Route::view('dashboard', 'dashboard')

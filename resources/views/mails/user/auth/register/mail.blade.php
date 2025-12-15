@@ -13,12 +13,12 @@
         </p>
 
         <p style="font-size: 16px; margin-bottom: 20px;">
-            新規申込みの受付が完了いたしました。以下の情報でログインできます。
+            新規申込みの受付が完了いたしました。以下のリンクをクリックして、登録手続きを完了してください。
         </p>
 
         <div style="background-color: #f5f5f5; border-left: 4px solid #ED4141; padding: 20px; margin: 20px 0;">
             <h2 style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px;">
-                ログイン情報
+                登録確認
             </h2>
 
             @if (isset($mailInfo['email']))
@@ -27,27 +27,34 @@
                 </p>
             @endif
 
-            <p style="font-size: 16px; margin-bottom: 10px;">
-                <strong>パスワード:</strong> <span
-                    style="font-family: monospace; background-color: #fff; padding: 5px 10px; border: 1px solid #ddd; display: inline-block; font-weight: 600; color: #ED4141;">{{ $mailInfo['password'] ?? '' }}</span>
+            <p style="font-size: 16px; margin-bottom: 15px;">
+                下記のボタンをクリックして、登録手続きを完了してください。
             </p>
+
+            @if (isset($mailInfo['token']))
+                <a href="{{ route('user.register.confirm', ['token' => $mailInfo['token']]) }}"
+                    style="display: inline-block; background-color: #ED4141; color: #fff; padding: 12px 30px; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 16px; text-align: center;">
+                    登録手続きを完了する
+                </a>
+            @endif
         </div>
 
         <div
             style="background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; padding: 15px; margin: 20px 0;">
             <p style="font-size: 14px; color: #856404; margin: 0;">
-                <strong>⚠️ 重要:</strong> セキュリティのため、初回ログイン後はパスワードの変更をお願いいたします。
+                <strong>⚠️ 重要:</strong> このリンクは24時間有効です。期限を過ぎた場合は、再度お申込みください。
             </p>
+            <p style="font-size: 14px; color: #856404; margin: 0;">期限: {{ $mailInfo['expires_at'] ?? '' }}</p>
         </div>
 
-        <div style="margin: 30px 0;">
-            <p style="font-size: 16px; margin-bottom: 15px;">
-                以下のリンクからログインページにアクセスできます：
+        <div style="margin: 30px 0; padding: 15px; background-color: #f9f9f9; border-radius: 4px;">
+            <p style="font-size: 14px; color: #666; margin: 0;">
+                <strong>リンクがクリックできない場合:</strong><br>
+                以下のURLをブラウザのアドレスバーにコピー＆ペーストしてください。<br>
+                <span style="font-family: monospace; font-size: 12px; word-break: break-all; color: #ED4141;">
+                    {{ route('user.register.confirm', ['token' => $mailInfo['token'] ?? '']) }}
+                </span>
             </p>
-            <a href="{{ route('user.login') }}"
-                style="display: inline-block; background-color: #ED4141; color: #fff; padding: 12px 30px; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 16px;">
-                ログインページへ
-            </a>
         </div>
 
         <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
