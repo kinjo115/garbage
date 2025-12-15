@@ -38,12 +38,13 @@
                 <form action="{{ route('user.register.store') }}" method="POST" class="mt-16">
                     @csrf
                     <div class="form-group">
-                        <div class="flex gap-10">
+                        <div class="flex items-center gap-10">
                             <label for="email" class="form-label required">メールアドレス</label> <span
-                                class="text-gray-500">※半角英数字</span>
+                                class="text-sm text-gray-500">※半角英数字</span>
                         </div>
                         <div class="form-input-wrapper">
-                            <input type="email" name="email" id="email" class="form-input">
+                            <input type="email" name="email" id="email" class="form-input"
+                                value="{{ old('email') }}" required>
                             <div class="form-input-error">
                                 @error('email')
                                     <p class="text-red-500">{{ $message }}</p>
@@ -73,6 +74,5 @@
                 </div>
             </div>
         </div>
-    </div>
     </div>
 @endsection
