@@ -1,0 +1,112 @@
+# Laravel
+/.phpunit.cache
+/.phpunit.result.cache
+/vendor
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+!/storage/framework/cache/.gitignore
+!/storage/framework/sessions/.gitignore
+!/storage/framework/views/.gitignore
+!/storage/logs/.gitignore
+
+# Environment files
+.env
+.env.backup
+.env.production
+.env.local
+.env.*.local
+
+# IDE & Editor files
+/.fleet
+/.idea
+/.nova
+/.vscode
+/.zed
+.phpactor.json
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Composer
+/auth.json
+/vendor
+composer.phar
+
+# NPM
+npm-debug.log
+yarn-error.log
+yarn.lock
+package-lock.json
+.pnpm-debug.log
+
+# Laravel specific
+Homestead.json
+Homestead.yaml
+.phpunit.result.cache
+.phpunit.cache
+bootstrap/cache/*
+!bootstrap/cache/.gitignore
+
+# Testing
+/coverage
+/.phpunit.cache
+
+# Build files
+/public/build
+/public/hot
+/public/mix-manifest.json
+/public/js
+/public/css
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.cache
+*.swp
+*.swo
+
+# Blade compiled views (if using view caching)
+/storage/framework/views/*.php
+!/storage/framework/views/.gitignore
+
+# Laravel Sail
+/.docker
+
+# Laravel Mix
+/public/mix-manifest.json
+
+# Laravel Horizon
+/storage/horizon
+
+# Laravel Telescope
+/storage/telescope
+
+# Laravel Passport
+/storage/oauth-private.key
+/storage/oauth-public.key
