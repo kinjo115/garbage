@@ -110,6 +110,68 @@ class TempUserController extends Controller
             return abort(404);
         }
 
+        if (!$tempUser->userInfo) {
+            return redirect()->route('user.register.confirm', ['token' => $token])
+                ->with('error', '新規申込みの登録が完了していません。最初からやり直してください。');
+        }
+
         return view('user.temp_user.register_confirmed_map', compact('tempUser'));
+    }
+
+    /**
+     * 地図位置情報を保存
+     */
+    public function storeMapLocation(Request $request, $token)
+    {
+        $tempUser = TempUser::where('token', $token)->first();
+
+        if (!$tempUser) {
+            return redirect()->route('user.register')
+                ->with('error', '無効なトークンです。');
+        }
+
+        $request->validate([
+            'home_latitude' => 'nullable|numeric|between:-90,90',
+            'home_longitude' => 'nullable|numeric|between:-180,180',
+            'disposal_latitude' => 'nullable|numeric|between:-90,90',
+            'disposal_longitude' => 'nullable|numeric|between:-180,180',
+            'apply_after_building' => 'nullable|boolean',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $userInfo = UserInfo::where('temp_user_id', $tempUser->id)->first();
+
+            if (!$userInfo) {
+                return redirect()->route('user.register.confirm', ['token' => $token])
+                    ->with('error', 'ユーザー情報が見つかりません。最初からやり直してください。');
+            }
+
+            $userInfo->update([
+                'home_latitude' => $request->input('home_latitude'),
+                'home_longitude' => $request->input('home_longitude'),
+                'disposal_latitude' => $request->input('disposal_latitude'),
+                'disposal_longitude' => $request->input('disposal_longitude'),
+                'apply_after_building' => $request->has('apply_after_building'),
+            ]);
+
+            DB::commit();
+
+            // 次のステップ（品目入力画面）へリダイレクト
+            return redirect()->route('user.register.confirm.items', ['token' => $token])
+                ->with('success', '地図登録が完了しました。');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('地図位置情報保存エラー: ' . $e->getMessage(), [
+                'token' => $token,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', '地図登録に失敗しました。もう一度お試しください。');
+        }
     }
 }

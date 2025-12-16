@@ -27,6 +27,11 @@ class UserInfo extends Model
         'apartment_number',
         'phone_number',
         'emergency_contact',
+        'home_latitude',
+        'home_longitude',
+        'disposal_latitude',
+        'disposal_longitude',
+        'apply_after_building',
     ];
 
     public function user()
@@ -48,4 +53,12 @@ class UserInfo extends Model
     {
         return $this->belongsTo(TempUser::class);
     }
+
+    protected $casts = [
+        'apply_after_building' => 'boolean',
+        'home_latitude' => 'decimal:8',
+        'home_longitude' => 'decimal:8',
+        'disposal_latitude' => 'decimal:8',
+        'disposal_longitude' => 'decimal:8',
+    ];
 }

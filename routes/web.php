@@ -25,6 +25,7 @@ Route::prefix('user')->name('user.')->middleware('guest')->group(function () {
     Route::get('register/token/{token}', [UserTempUserController::class, 'confirmRegister'])->name('register.confirm');
     Route::post('register/token/{token}', [UserTempUserController::class, 'storeRegisterConfirmed'])->name('register.confirm.store');
     Route::get('register/token/{token}/map', [UserTempUserController::class, 'storeRegisterConfirmedMap'])->name('register.confirm.store.map');
+    Route::post('register/token/{token}/map', [UserTempUserController::class, 'storeMapLocation'])->name('register.confirm.store.map.save');
 });
 
 // Route::view('dashboard', 'dashboard')

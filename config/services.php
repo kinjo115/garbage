@@ -42,4 +42,9 @@ return [
         'secret_key' => env('JAPAN_POST_SECRET_KEY', 'uXuN0ejHG7nAn89AfAwa'),
     ],
 
+    // Google Maps API設定
+    'google_maps' => [
+        'api_key' => env('GOOGLE_MAPS_API_KEY'),
+    ],
+
 ];

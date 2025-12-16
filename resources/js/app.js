@@ -47,7 +47,15 @@ $(document).ready(function() {
         }
 
         if (!searchCode || searchCode.length < 3) {
-            alert('郵便番号またはデジタルアドレスを3文字以上入力してください。');
+            Toastify({
+                text: '郵便番号またはデジタルアドレスを3文字以上入力してください。',
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: "linear-gradient(to right, #ff6b6b, #ee5a6f)",
+                }
+            }).showToast();
             $('#postal_code').focus();
             return;
         }
@@ -92,7 +100,15 @@ $(document).ready(function() {
                 // レスポンスが文字列（JWTトークンなど）の場合
                 if (typeof response === 'string') {
                     console.error('予期しないレスポンス形式（文字列）:', response.substring(0, 50));
-                    alert('住所の取得に失敗しました。\nAPIレスポンスが無効な形式です。');
+                    Toastify({
+                        text: '住所の取得に失敗しました。APIレスポンスが無効な形式です。',
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "linear-gradient(to right, #ff6b6b, #ee5a6f)",
+                        }
+                    }).showToast();
                     $btn.prop('disabled', false).text(originalText);
                     return;
                 }
@@ -100,7 +116,15 @@ $(document).ready(function() {
                 // レスポンスがオブジェクトでない場合
                 if (typeof response !== 'object' || response === null) {
                     console.error('予期しないレスポンス形式:', typeof response, response);
-                    alert('住所の取得に失敗しました。\nAPIレスポンスが無効な形式です。');
+                    Toastify({
+                        text: '住所の取得に失敗しました。APIレスポンスが無効な形式です。',
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "linear-gradient(to right, #ff6b6b, #ee5a6f)",
+                        }
+                    }).showToast();
                     $btn.prop('disabled', false).text(originalText);
                     return;
                 }
@@ -147,7 +171,15 @@ $(document).ready(function() {
                     errorMessage += '\nサーバーエラーが発生しました。';
                 }
 
-                alert(errorMessage);
+                Toastify({
+                    text: errorMessage.replace(/\n/g, ' '),
+                    duration: 5000,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "linear-gradient(to right, #ff6b6b, #ee5a6f)",
+                    }
+                }).showToast();
                 $btn.prop('disabled', false).text(originalText);
             }
         });
@@ -170,7 +202,15 @@ $(document).ready(function() {
             }
 
             if (addressList.length === 0) {
-                alert('該当する住所が見つかりませんでした。');
+                Toastify({
+                    text: '該当する住所が見つかりませんでした。',
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "linear-gradient(to right, #ff6b6b, #ee5a6f)",
+                    }
+                }).showToast();
                 return;
             }
 
