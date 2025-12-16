@@ -1,67 +1,86 @@
-    .c-button {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        max-width: 400px;
-        width: 100%;
-        margin: auto;
-        height: 60px;
-        font-size: 24px;
-        text-align: center;
-        border-radius: 30px;
-        cursor: pointer;
+.c-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 400px;
+    width: 100%;
+    margin: auto;
+    height: 60px;
+    font-size: 24px;
+    text-align: center;
+    border-radius: 30px;
+    cursor: pointer;
 
-        &:hover {
-            opacity: 0.8;
-        }
-
-
-        &.btn-416FED {
-            background-color: #416FED;
-            color: #fff;
-        }
-
-        &.btn-ED4141 {
-            background-color: #ED4141;
-            color: #fff;
-        }
+    &:hover {
+        opacity: 0.8;
     }
 
-    .breadcrumbs {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 20px;
-        color: #505050;
 
-        &-item {
-            &:not(:last-child) {
-                &::after {
-                    content: '>';
-                    margin-left: 10px;
-                }
+    &.btn-416FED {
+        background-color: #416FED;
+        color: #fff;
+    }
+
+    &.btn-ED4141 {
+        background-color: #ED4141;
+        color: #fff;
+    }
+}
+
+.breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    color: #505050;
+
+    &-item {
+        &:not(:last-child) {
+            &::after {
+                content: '>';
+                margin-left: 10px;
             }
         }
     }
+}
 
-    .text-E20000 {
-        color: #E20000;
+.text-E20000 {
+    color: #E20000;
+}
+
+.form-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #1F1F1F;
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    height: 48px;
+    cursor: pointer;
+
+    &:hover {
+        opacity: 0.8;
     }
+}
 
-    .form-btn {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background-color: #1F1F1F;
-        color: white;
-        font-size: 16px;
-        padding: 10px 20px;
-        border-radius: 5px;
-        height: 48px;
-        cursor: pointer;
+.c-btn-black {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #1F1F1F;
+    color: white;
+    font-size: 16px;
+    min-width: 190px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    height: 48px;
+    cursor: pointer;
 
-        &:hover {
-            opacity: 0.8;
-        }
+    &:hover {
+        opacity: 0.8;
     }
+}

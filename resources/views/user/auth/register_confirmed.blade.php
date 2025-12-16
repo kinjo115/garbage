@@ -107,7 +107,7 @@
                             <div class="flex flex-wrap gap-2">
                                 <input type="text" name="postal_code" id="postal_code" class="form-input max-w-1/2"
                                     value="" required>
-                                <button type="button" class="form-btn">住所を反映する</button>
+                                <button type="button" class="form-btn" id="fetch-address-btn">住所を反映する</button>
                             </div>
                             <div class="form-input-error">
                                 @error('postal_code')
@@ -154,20 +154,144 @@
                     </div>
                     <div class="form-group">
                         <div class="flex items-center gap-10">
-                            <label for="city" class="form-label required">町名</label>
+                            <label for="town" class="form-label required">町名</label>
                         </div>
                         <div class="form-input-wrapper">
-                            <input type="text" name="city" id="city" class="form-input max-w-1/2"
-                                value="{{ old('city') }}" required>
+                            <input type="text" name="town" id="town" class="form-input max-w-1/2"
+                                value="{{ old('town') }}" required>
                             <div class="form-input-error">
-                                @error('city')
+                                @error('town')
                                     <p class="text-red-500">{{ $message }}</p>
                                 @enderror
                             </div>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <div class="flex items-center gap-10">
+                            <label for="town" class="form-label required">番地</label>
+                        </div>
+                        <div class="form-input-wrapper">
+                            <div class="flex items-center gap-2">
+                                <input type="text" name="chome" id="chome" class="form-input max-w-[100px]"
+                                    value="{{ old('chome') }}" required>
+                                <span class="mr-5">丁目</span>
+                                <input type="text" name="building_number" id="building_number"
+                                    class="form-input max-w-[100px]" value="{{ old('building_number') }}" required>
+                                <span class="mr-5">番</span>
+                                <input type="text" name="house_number" id="house_number"
+                                    class="form-input max-w-[100px]" value="{{ old('house_number') }}" required>
+                                <span>号</span>
+                            </div>
+                            <div class="text-sm mt-2 text-gray-500">
+                                <p>（号に枝番がある場合は、「2-3」のように入力してください）</p>
+                                <p>※部屋番号は番地欄に入力しないでください</p>
+                            </div>
+                            <div class="form-input-error">
+                                @error('chome')
+                                    <p class="text-red-500">{{ $message }}</p>
+                                @enderror
+                                @error('building_number')
+                                    <p class="text-red-500">{{ $message }}</p>
+                                @enderror
+                                @error('house_number')
+                                    <p class="text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="flex items-center gap-10">
+                            <label for="town" class="form-label required">マンション名</label>
+                        </div>
+                        <div class="form-input-wrapper">
+                            <div class="flex items-end gap-2">
+                                <input type="text" name="apartment_name" id="apartment_name"
+                                    class="form-input max-w-1/2 mr-5" value="{{ old('apartment_name') }}" required>
+                                <span class="">部屋番号</span>
+                                <input type="text" name="apartment_number" id="apartment_number"
+                                    class="form-input max-w-[100px]" value="{{ old('apartment_number') }}" required>
+                            </div>
+                            <div class="text-sm mt-2 text-gray-500">
+                                <p>（部屋番号まで入力してください。）</p>
+                                <p>例) コーポ名古屋　 １０３　※集合住宅にお住いの方は必ず入力してください。</p>
+                            </div>
+                            <div class="form-input-error">
+                                @error('apartment_name')
+                                    <p class="text-red-500">{{ $message }}</p>
+                                @enderror
+                                @error('apartment_number')
+                                    <p class="text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="flex items-center gap-10">
+                            <label for="town" class="form-label required">電話番号</label>
+                        </div>
+                        <div class="form-input-wrapper">
+                            <input type="text" name="phone_number" id="phone_number" class="form-input max-w-1/2"
+                                value="{{ old('phone_number') }}" required>
+                            <div class="text-sm mt-2 text-gray-500">
+                                <p>※市外局番から入力して下さい。ハイフン不要(数字のみ)</p>
+                            </div>
+                            <div class="form-input-error">
+                                @error('phone_number')
+                                    <p class="text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="flex items-center gap-10">
+                            <label for="emergency_contact" class="form-label required">緊急連絡先</label>
+                        </div>
+                        <div class="form-input-wrapper">
+                            <input type="text" name="emergency_contact" id="emergency_contact" class="form-input"
+                                value="{{ old('emergency_contact') }}" required>
+                            <div class="text-sm mt-2 text-gray-500">
+                                <p>※平日の9:00～17:00の間に繋がる番号を市外局番から入力して下さい。ハイフン不要(数字のみ)</p>
+                                <p>※内容確認のため、お電話をさせて頂くことがあります。</p>
+                            </div>
+                        </div>
+                        <div class="form-input-error">
+                            @error('emergency_contact')
+                                <p class="text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="flex items-center gap-10">
+                            <label for="email" class="form-label required">メールアドレス</label>
+                        </div>
+                        <div class="form-input-wrapper">
+                            <input type="text" name="email" id="email" class="form-input max-w-1/2"
+                                value="{{ old('email', $tempUser->email) }}" required readonly>
+                        </div>
+                        <div class="form-input-error">
+                            @error('email')
+                                <p class="text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="text-center mt-10">
+                        <p>上記の入力内容を確認し、内容に誤りがなければ</p>
+                        <p>「地図の登録に進む」ボタンをクリックしてください。</p>
+                    </div>
+                    <div class="form-submit">
+                        <button type="submit" class="c-button btn-416FED">地図の登録に進む</button>
+                    </div>
+                    <div class="md:mt-16 mt-10 flex justify-center">
+                        <a href="#" class="c-btn-black">戻る</a>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <script>
+        // Pass Laravel route URL to JavaScript
+        window.japanPostApiUrl = '{{ route('api.japan-post.search') }}';
+        console.log('Japan Post API URL:', window.japanPostApiUrl);
+    </script>
 @endsection

@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    // 日本郵便API設定
+    'japan_post' => [
+        'api_url' => env('JAPAN_POST_API_URL', 'https://stub-qz73x.da.pf.japanpost.jp/api/v1'),
+        'client_id' => env('JAPAN_POST_CLIENT_ID', 'Biz_DaPfJapanpost_MockAPI_j3QKS'),
+        'secret_key' => env('JAPAN_POST_SECRET_KEY', 'uXuN0ejHG7nAn89AfAwa'),
+    ],
+
 ];

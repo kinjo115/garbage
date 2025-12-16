@@ -11,6 +11,9 @@ use App\Http\Controllers\User\AuthenticationController as UserAuthenticationCont
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Japan Post API proxy
+Route::get('/api/japan-post/search', [App\Http\Controllers\Api\JapanPostController::class, 'searchAddress'])->name('api.japan-post.search');
+
 Route::prefix('user')->name('user.')->middleware('guest')->group(function () {
     Route::get('login', [UserAuthenticationController::class, 'create'])->name('login');
     Route::post('login', [UserAuthenticationController::class, 'store'])->name('login.store');
