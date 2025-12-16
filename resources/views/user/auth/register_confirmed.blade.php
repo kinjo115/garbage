@@ -1,0 +1,173 @@
+@php
+    $housingTypes = \App\Models\HousingType::all();
+    $prefectures = \App\Models\Prefecture::all();
+@endphp
+
+@extends('layouts.app')
+
+@section('meta')
+    <title>新規申込みの登録 | 名古屋市ゴミ収集サイト</title>
+    <meta name="description" content="新規申込みの登録 | 名古屋市ゴミ収集サイト">
+    <meta name="keywords" content="新規申込みの登録,名古屋市,ゴミ収集,ゴミ収集サイト">
+    <meta name="author" content="名古屋市ゴミ収集サイト">
+    <meta property="og:title" content="新規申込みの登録 | 名古屋市ゴミ収集サイト">
+    <meta property="og:description" content="新規申込みの登録 | 名古屋市ゴミ収集サイト">
+    <meta property="og:image" content="{{ asset('assets/images/ogp.png') }}">
+    <meta property="og:url" content="{{ route('user.register.confirm', ['token' => $tempUser->token]) }}">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="ja_JP">
+    <meta property="og:site_name" content="名古屋市ゴミ収集サイト">
+@endsection
+
+@section('content')
+    <div class="c-page">
+        <div class="c-container">
+            <div class="breadcrumbs">
+                <div class="breadcrumbs-item">
+                    <a href="{{ route('home') }}">ホーム</a>
+                </div>
+                <div class="breadcrumbs-item">
+                    <span>新規申込みの登録</span>
+                </div>
+            </div>
+            <div class="page-content form-content">
+                <div class="page-header">
+                    <h1 class="page-title">新規申込みの登録</h1>
+                </div>
+                <div class="form-description">
+                    <p class="text-E20000">申込む前に必ずお読みください</p>
+                    <br>
+                    <p>・名古屋市に在住の方のみ、お申し込みができます。</p>
+                    <p>・第三者によるお申し込みはできません。必ず粗大ごみの所有者本人、もしくは同居の家族の方が申し込んでください。</p>
+                    <p>・(*)のある項目は必須項目です。</p>
+                    <p>・町名は、「町丁目を選択する」ボタンを押して住所検索画面から選択します。（直接入力はできません）</p>
+                    <p>・番地は、数字で入力してください。</p>
+                    <p>・電話番号と緊急連絡先はハイフンなしで入力してください。</p>
+                </div>
+                <div class="form-description mt-16">
+                    <div class="text-E20000 mb-4">注意事項</div>
+                    <p>・お申し込みの途中に前の画面に戻る場合は、必ず各画面の「戻る」ボタンをクリックしてください。</p>
+                    <p>※ブラウザの「戻る」機能は使用しないでください。</p>
+                </div>
+                <form action="" class="mt-16">
+                    <div class="grid md:grid-cols-2 grid-cols-1 gap-2">
+                        <div class="form-group">
+                            <div class="flex items-center gap-10">
+                                <label for="last_name" class="form-label required">姓</label>
+                            </div>
+                            <div class="form-input-wrapper">
+                                <input type="text" name="last_name" id="last_name" class="form-input" required>
+                            </div>
+                            <div class="form-input-error">
+                                @error('last_name')
+                                    <p class="text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="flex items-center gap-10">
+                                <label for="first_name" class="form-label required">名</label>
+                            </div>
+                            <div class="form-input-wrapper">
+                                <input type="text" name="first_name" id="first_name" class="form-input" required>
+                            </div>
+                            <div class="form-input-error">
+                                @error('first_name')
+                                    <p class="text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="flex items-center gap-10">
+                            <label for="housing_type_id" class="form-label required">住宅種別</label>
+                        </div>
+                        <div class="form-input-wrapper">
+                            <select name="housing_type_id" id="housing_type_id" class="form-input max-w-1/2">
+                                <option value="">住宅種別を選択してください</option>
+                                @foreach ($housingTypes as $housingType)
+                                    <option value="{{ $housingType->id }}"
+                                        {{ old('housing_type_id') == $housingType->id ? 'selected' : '' }}>
+                                        {{ $housingType->name }}</option>
+                                @endforeach
+                                <div class="form-input-error">
+                                    @error('housing_type_id')
+                                        <p class="text-red-500">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </select>
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="flex items-center gap-10">
+                            <label for="prefecture_id" class="form-label required">郵便番号</label>
+                        </div>
+                        <div class="form-input-wrapper">
+                            <div class="flex flex-wrap gap-2">
+                                <input type="text" name="postal_code" id="postal_code" class="form-input max-w-1/2"
+                                    value="" required>
+                                <button type="button" class="form-btn">住所を反映する</button>
+                            </div>
+                            <div class="form-input-error">
+                                @error('postal_code')
+                                    <p class="text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+                        <div class="flex items-center gap-10">
+                            <label for="prefecture_id" class="form-label required">郵便番号</label>
+                        </div>
+                        <div class="form-input-wrapper">
+                            <select name="prefecture_id" id="prefecture_id" class="form-input max-w-1/2">
+                                <option value="">都道府県を選択してください</option>
+                                @foreach ($prefectures as $prefecture)
+                                    <option value="{{ $prefecture->id }}"
+                                        {{ old('prefecture_id') == $prefecture->id ? 'selected' : '' }}>
+                                        {{ $prefecture->name }}</option>
+                                @endforeach
+                            </select>
+                            <div class="form-input-error">
+                                @error('prefecture_id')
+                                    <p class="text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="flex items-center gap-10">
+                            <label for="city" class="form-label required">都道府県</label>
+                        </div>
+                        <div class="form-input-wrapper">
+                            <input type="text" name="city" id="city" class="form-input max-w-1/2"
+                                value="{{ old('city') }}" required>
+                            <div class="form-input-error">
+                                @error('city')
+                                    <p class="text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="flex items-center gap-10">
+                            <label for="city" class="form-label required">町名</label>
+                        </div>
+                        <div class="form-input-wrapper">
+                            <input type="text" name="city" id="city" class="form-input max-w-1/2"
+                                value="{{ old('city') }}" required>
+                            <div class="form-input-error">
+                                @error('city')
+                                    <p class="text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+@endsection
