@@ -56,7 +56,7 @@
     @if ($errors->any())
         <script>
             Toastify({
-                text: "エラーが発生しました。",
+                text: "{{ $errors->first() }}",
                 duration: 3000,
                 newWindow: true,
                 close: true,

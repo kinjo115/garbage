@@ -93,7 +93,7 @@
                                 <option value="">住宅種別を選択してください</option>
                                 @foreach ($housingTypes as $housingType)
                                     <option value="{{ $housingType->id }}"
-                                        {{ old('housing_type_id') == $housingType->id ? 'selected' : '' }}>
+                                        {{ old('housing_type_id', $tempUser->userInfo ? $tempUser->userInfo->housing_type_id : '') == $housingType->id ? 'selected' : '' }}>
                                         {{ $housingType->name }}</option>
                                 @endforeach
                                 <div class="form-input-error">
