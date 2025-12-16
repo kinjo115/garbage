@@ -9,6 +9,7 @@ use Laravel\Fortify\Features;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\User\AuthenticationController as UserAuthenticationController;
 use App\Http\Controllers\User\TempUserController as UserTempUserController;
+use App\Http\Controllers\User\TempUserItemController as UserTempUserItemController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -29,6 +30,10 @@ Route::prefix('user')->name('user.')->middleware('guest')->group(function () {
     Route::post('register/token/{token}/map/cancel', [UserTempUserController::class, 'cancelMapLocation'])->name('register.confirm.store.map.cancel');
     Route::get('register/token/{token}/complete', [UserTempUserController::class, 'complete'])->name('register.confirm.complete');
     Route::get('register/token/{token}/phone', [UserTempUserController::class, 'phone'])->name('register.phone');
+
+    Route::prefix('item')->name('item.')->group(function () {
+        Route::get('token/{token}', [UserTempUserItemController::class, 'index'])->name('index');
+    });
 });
 
 // Route::view('dashboard', 'dashboard')
