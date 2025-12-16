@@ -72,19 +72,4 @@ class AuthenticationController extends Controller
                 ->with('error', __('messages.register_failed'));
         }
     }
-
-    public function confirmRegisterCreate($token)
-    {
-        $tempUser = TempUser::where('token', $token)->where('expires_at', '>', now())->where('status', 0)->first();
-
-        if (!$tempUser) {
-            return abort(404);
-        }
-
-        // $tempUser->update([
-        //     'status' => 1,
-        // ]);
-
-        return view('user.auth.register_confirmed', compact('tempUser'));
-    }
 }

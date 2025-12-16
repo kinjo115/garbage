@@ -66,4 +66,12 @@ class User extends Authenticatable
             ->map(fn($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
+
+    /**
+     * ユーザー情報とのリレーション
+     */
+    public function userInfo()
+    {
+        return $this->hasOne(UserInfo::class);
+    }
 }

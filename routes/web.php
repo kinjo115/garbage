@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\User\AuthenticationController as UserAuthenticationController;
+use App\Http\Controllers\User\TempUserController as UserTempUserController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -21,7 +22,9 @@ Route::prefix('user')->name('user.')->middleware('guest')->group(function () {
     Route::get('register', [UserAuthenticationController::class, 'createRegister'])->name('register');
     Route::post('register', [UserAuthenticationController::class, 'storeRegister'])->name('register.store');
 
-    Route::get('register/token/{token}', [UserAuthenticationController::class, 'confirmRegisterCreate'])->name('register.confirm');
+    Route::get('register/token/{token}', [UserTempUserController::class, 'confirmRegister'])->name('register.confirm');
+    Route::post('register/token/{token}', [UserTempUserController::class, 'storeRegisterConfirmed'])->name('register.confirm.store');
+    Route::get('register/token/{token}/map', [UserTempUserController::class, 'storeRegisterConfirmedMap'])->name('register.confirm.store.map');
 });
 
 // Route::view('dashboard', 'dashboard')

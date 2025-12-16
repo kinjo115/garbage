@@ -20,4 +20,9 @@ class TempUser extends Model
     protected $casts = [
         'expires_at' => 'datetime',
     ];
+
+    public function userInfo()
+    {
+        return $this->hasOne(UserInfo::class);
+    }
 }

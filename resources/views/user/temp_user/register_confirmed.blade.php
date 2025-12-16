@@ -49,14 +49,18 @@
                     <p>・お申し込みの途中に前の画面に戻る場合は、必ず各画面の「戻る」ボタンをクリックしてください。</p>
                     <p>※ブラウザの「戻る」機能は使用しないでください。</p>
                 </div>
-                <form action="" class="mt-16">
+                <form action="{{ route('user.register.confirm.store', ['token' => $tempUser->token]) }}" method="POST"
+                    class="mt-16">
+                    @csrf
                     <div class="grid md:grid-cols-2 grid-cols-1 gap-2">
                         <div class="form-group">
                             <div class="flex items-center gap-10">
                                 <label for="last_name" class="form-label required">姓</label>
                             </div>
                             <div class="form-input-wrapper">
-                                <input type="text" name="last_name" id="last_name" class="form-input" required>
+                                <input type="text" name="last_name" id="last_name" class="form-input"
+                                    value="{{ old('last_name', $tempUser->userInfo ? $tempUser->userInfo->last_name : '') }}"
+                                    required>
                             </div>
                             <div class="form-input-error">
                                 @error('last_name')
@@ -69,7 +73,9 @@
                                 <label for="first_name" class="form-label required">名</label>
                             </div>
                             <div class="form-input-wrapper">
-                                <input type="text" name="first_name" id="first_name" class="form-input" required>
+                                <input type="text" name="first_name" id="first_name" class="form-input"
+                                    value="{{ old('first_name', $tempUser->userInfo ? $tempUser->userInfo->first_name : '') }}"
+                                    required>
                             </div>
                             <div class="form-input-error">
                                 @error('first_name')
@@ -106,7 +112,8 @@
                         <div class="form-input-wrapper">
                             <div class="flex flex-wrap gap-2">
                                 <input type="text" name="postal_code" id="postal_code" class="form-input max-w-1/2"
-                                    value="" required>
+                                    value="{{ old('postal_code', $tempUser->userInfo ? $tempUser->userInfo->postal_code : '') }}"
+                                    required>
                                 <button type="button" class="form-btn" id="fetch-address-btn">住所を反映する</button>
                             </div>
                             <div class="form-input-error">
@@ -120,14 +127,14 @@
 
                     <div class="form-group">
                         <div class="flex items-center gap-10">
-                            <label for="prefecture_id" class="form-label required">郵便番号</label>
+                            <label for="prefecture_id" class="form-label required">都道府県</label>
                         </div>
                         <div class="form-input-wrapper">
                             <select name="prefecture_id" id="prefecture_id" class="form-input max-w-1/2">
                                 <option value="">都道府県を選択してください</option>
                                 @foreach ($prefectures as $prefecture)
                                     <option value="{{ $prefecture->id }}"
-                                        {{ old('prefecture_id') == $prefecture->id ? 'selected' : '' }}>
+                                        {{ old('prefecture_id', $tempUser->userInfo ? $tempUser->userInfo->prefecture_id : '23') == $prefecture->id ? 'selected' : '' }}>
                                         {{ $prefecture->name }}</option>
                                 @endforeach
                             </select>
@@ -140,11 +147,12 @@
                     </div>
                     <div class="form-group">
                         <div class="flex items-center gap-10">
-                            <label for="city" class="form-label required">都道府県</label>
+                            <label for="city" class="form-label required">市区町村</label>
                         </div>
                         <div class="form-input-wrapper">
                             <input type="text" name="city" id="city" class="form-input max-w-1/2"
-                                value="{{ old('city') }}" required>
+                                value="{{ old('city', $tempUser->userInfo ? $tempUser->userInfo->city : '名古屋市') }}"
+                                required>
                             <div class="form-input-error">
                                 @error('city')
                                     <p class="text-red-500">{{ $message }}</p>
@@ -158,7 +166,7 @@
                         </div>
                         <div class="form-input-wrapper">
                             <input type="text" name="town" id="town" class="form-input max-w-1/2"
-                                value="{{ old('town') }}" required>
+                                value="{{ old('town', $tempUser->userInfo ? $tempUser->userInfo->town : '') }}" required>
                             <div class="form-input-error">
                                 @error('town')
                                     <p class="text-red-500">{{ $message }}</p>
@@ -173,13 +181,15 @@
                         <div class="form-input-wrapper">
                             <div class="flex items-center gap-2">
                                 <input type="text" name="chome" id="chome" class="form-input max-w-[100px]"
-                                    value="{{ old('chome') }}" required>
+                                    value="{{ old('chome', $tempUser->userInfo ? $tempUser->userInfo->chome : '') }}">
                                 <span class="mr-5">丁目</span>
                                 <input type="text" name="building_number" id="building_number"
-                                    class="form-input max-w-[100px]" value="{{ old('building_number') }}" required>
+                                    class="form-input max-w-[100px]"
+                                    value="{{ old('building_number', $tempUser->userInfo ? $tempUser->userInfo->building_number : '') }}">
                                 <span class="mr-5">番</span>
                                 <input type="text" name="house_number" id="house_number"
-                                    class="form-input max-w-[100px]" value="{{ old('house_number') }}" required>
+                                    class="form-input max-w-[100px]"
+                                    value="{{ old('house_number', $tempUser->userInfo ? $tempUser->userInfo->house_number : '') }}">
                                 <span>号</span>
                             </div>
                             <div class="text-sm mt-2 text-gray-500">
@@ -206,10 +216,12 @@
                         <div class="form-input-wrapper">
                             <div class="flex items-end gap-2">
                                 <input type="text" name="apartment_name" id="apartment_name"
-                                    class="form-input max-w-1/2 mr-5" value="{{ old('apartment_name') }}" required>
+                                    class="form-input max-w-1/2 mr-5"
+                                    value="{{ old('apartment_name', $tempUser->userInfo ? $tempUser->userInfo->apartment_name : '') }}">
                                 <span class="">部屋番号</span>
                                 <input type="text" name="apartment_number" id="apartment_number"
-                                    class="form-input max-w-[100px]" value="{{ old('apartment_number') }}" required>
+                                    class="form-input max-w-[100px]"
+                                    value="{{ old('apartment_number', $tempUser->userInfo ? $tempUser->userInfo->apartment_number : '') }}">
                             </div>
                             <div class="text-sm mt-2 text-gray-500">
                                 <p>（部屋番号まで入力してください。）</p>
@@ -231,7 +243,8 @@
                         </div>
                         <div class="form-input-wrapper">
                             <input type="text" name="phone_number" id="phone_number" class="form-input max-w-1/2"
-                                value="{{ old('phone_number') }}" required>
+                                value="{{ old('phone_number', $tempUser->userInfo ? $tempUser->userInfo->phone_number : '') }}"
+                                required>
                             <div class="text-sm mt-2 text-gray-500">
                                 <p>※市外局番から入力して下さい。ハイフン不要(数字のみ)</p>
                             </div>
@@ -248,7 +261,8 @@
                         </div>
                         <div class="form-input-wrapper">
                             <input type="text" name="emergency_contact" id="emergency_contact" class="form-input"
-                                value="{{ old('emergency_contact') }}" required>
+                                value="{{ old('emergency_contact', $tempUser->userInfo ? $tempUser->userInfo->emergency_contact : '') }}"
+                                required>
                             <div class="text-sm mt-2 text-gray-500">
                                 <p>※平日の9:00～17:00の間に繋がる番号を市外局番から入力して下さい。ハイフン不要(数字のみ)</p>
                                 <p>※内容確認のため、お電話をさせて頂くことがあります。</p>
@@ -282,7 +296,7 @@
                         <button type="submit" class="c-button btn-416FED">地図の登録に進む</button>
                     </div>
                     <div class="md:mt-16 mt-10 flex justify-center">
-                        <a href="#" class="c-btn-black">戻る</a>
+                        <a href="{{ route('user.register') }}" class="c-btn-black">戻る</a>
                     </div>
                 </form>
             </div>
@@ -290,8 +304,6 @@
     </div>
 
     <script>
-        // Pass Laravel route URL to JavaScript
         window.japanPostApiUrl = '{{ route('api.japan-post.search') }}';
-        console.log('Japan Post API URL:', window.japanPostApiUrl);
     </script>
 @endsection
