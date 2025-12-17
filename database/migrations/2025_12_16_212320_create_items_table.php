@@ -18,7 +18,6 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('image')->nullable();
             $table->string('price');
-            $table->integer('stock')->nullable()->comment('0: unlimited');
             $table->tinyInteger('status')->default(1)->comment('0: inactive, 1:active and 2:sold out');
             $table->integer('sort')->default(0);
             $table->timestamps();

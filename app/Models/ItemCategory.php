@@ -10,7 +10,9 @@ class ItemCategory extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'name'
+        'name',
+        'parent_id',
+        'sort',
     ];
 
     public function items()
