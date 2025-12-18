@@ -212,23 +212,14 @@
             {{-- 最終確認セクション --}}
             <div class="confirmation-section">
                 <form id="agreement-form" method="GET" action="{{ route('user.register') }}">
-                    <div class="confirmation-checkboxes">
-                        <label class="confirmation-checkbox">
-                            <input type="checkbox" name="confirm_1" required>
-                            <span>上記内容について確認しました。</span>
-                        </label>
-                        <label class="confirmation-checkbox">
-                            <input type="checkbox" name="confirm_2" required>
-                            <span>申し込む粗大ごみは、家庭から出るものです。</span>
-                        </label>
-                        <label class="confirmation-checkbox">
-                            <input type="checkbox" name="confirm_3" required>
-                            <span>※家庭から出る粗大ごみ以外は申込みできません。</span>
-                        </label>
+                    <div class="confirmation-text text-center">
+                        <p>上記内容について確認しました。</p>
+                        <p>申し込む粗大ごみは、家庭から出るものです。</p>
+                        <p>※家庭から出る粗大ごみ以外は申込みできません。</p>
                     </div>
 
-                    <div class="confirmation-submit">
-                        <button type="submit" class="c-button-primary" id="agree-button" disabled>
+                    <div class="confirmation-submit mt-16">
+                        <button type="submit" class="c-button-primary" id="agree-button">
                             同意して進む
                         </button>
                     </div>
@@ -273,35 +264,23 @@
 
     <script>
         $(document).ready(function() {
-            // アコーディオンの開閉（一度に1つだけ開く、スムーズなアニメーション）
+            // アコーディオンの開閉（jQuery slideDown/slideUp使用、複数同時に開ける）
             $('.accordion-header').on('click', function() {
                 const $item = $(this).closest('.accordion-item');
+                const $content = $item.find('.accordion-content');
                 const $chevron = $(this).find('.accordion-chevron');
                 const isCurrentlyOpen = $item.hasClass('is-open');
 
-                // 他のアコーディオンをすべて閉じる
-                $('.accordion-item').not($item).each(function() {
-                    const $otherItem = $(this);
-                    const $otherChevron = $otherItem.find('.accordion-header .accordion-chevron');
-
-                    $otherItem.removeClass('is-open');
-                    $otherChevron.removeClass('is-open');
-                });
-
-                // クリックしたアコーディオンを開閉（CSSトランジションでスムーズに動作）
+                // クリックしたアコーディオンを開閉（jQuery slideDown/slideUp）
                 if (isCurrentlyOpen) {
                     $item.removeClass('is-open');
+                    $content.slideUp(400);
                     $chevron.removeClass('is-open');
                 } else {
                     $item.addClass('is-open');
+                    $content.slideDown(400);
                     $chevron.addClass('is-open');
                 }
-            });
-
-            // チェックボックスの確認
-            $('#agreement-form input[type="checkbox"]').on('change', function() {
-                const allChecked = $('#agreement-form input[type="checkbox"]:checked').length === 3;
-                $('#agree-button').prop('disabled', !allChecked);
             });
 
             // フォーム送信時にモーダルを表示（デフォルトの送信を防ぐ）

@@ -202,13 +202,10 @@
             }
 
             .accordion-content {
-                max-height: 0;
-                overflow: hidden;
-                padding: 0 20px;
+                display: none;
+                padding: 16px 20px;
                 background-color: #f9f9f9;
-                border-top: 1px solid transparent;
-                opacity: 0;
-                transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out, opacity 0.3s ease-in-out, border-color 0.3s ease-in-out;
+                border-top: 1px solid #e0e0e0;
 
                 p {
                     font-size: 14px;
@@ -216,16 +213,6 @@
                     color: #000;
                     font-family: "Noto Sans JP", sans-serif;
                     margin: 0;
-                    padding: 16px 0;
-                }
-            }
-
-            &.is-open {
-                .accordion-content {
-                    max-height: 1000px;
-                    padding: 0 20px;
-                    opacity: 1;
-                    border-top-color: #e0e0e0;
                 }
             }
         }
@@ -239,33 +226,18 @@
     margin-bottom: 40px;
     border-radius: 4px;
 
-    .confirmation-checkboxes {
+    .confirmation-text {
         margin-bottom: 32px;
 
-        .confirmation-checkbox {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 16px;
-            cursor: pointer;
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #000;
+            font-family: "Noto Sans JP", sans-serif;
+            margin-bottom: 8px;
 
             &:last-child {
                 margin-bottom: 0;
-            }
-
-            input[type="checkbox"] {
-                width: 20px;
-                height: 20px;
-                margin-right: 12px;
-                margin-top: 2px;
-                cursor: pointer;
-                flex-shrink: 0;
-            }
-
-            span {
-                font-size: 16px;
-                line-height: 1.6;
-                color: #000;
-                font-family: "Noto Sans JP", sans-serif;
             }
         }
     }
@@ -296,4 +268,3 @@
         }
     }
 }
-
