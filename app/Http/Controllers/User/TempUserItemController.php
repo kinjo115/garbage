@@ -17,6 +17,12 @@ class TempUserItemController extends Controller
             return abort(404);
         }
 
+        if ($tempUser->status < 2) {
+            return redirect()
+                ->route('user.register.confirm.store.map', ['token' => $token])
+                ->with('error', '申込みが完了していません。基本情報を入力してください。');
+        }
+
         $items = Item::all();
 
         $selected = SelectedItem::where('temp_user_id', $tempUser->id)
@@ -124,8 +130,62 @@ class TempUserItemController extends Controller
             ->whereNull('user_id')
             ->first();
 
+        if (!$selected) {
+            return redirect()
+                ->route('user.item.index', ['token' => $token])
+                ->with('error', '品目が選択されていません。');
+        }
+
         $initialSelectedItems = $selected?->selected_items ?? [];
 
-        return view('user.temp_user.item.confirmation', compact('tempUser', 'selected', 'initialSelectedItems'));
+        // 次回の第2水曜日を計算
+        $nextSecondWednesday = $this->getNextSecondWednesday();
+
+        return view('user.temp_user.item.confirmation', compact('tempUser', 'selected', 'initialSelectedItems', 'nextSecondWednesday'));
+    }
+
+    /**
+     * 次回の第2水曜日を取得
+     */
+    private function getNextSecondWednesday()
+    {
+        $now = now();
+
+        // 今月の第2水曜日を計算
+        $firstDayOfMonth = \Carbon\Carbon::create($now->year, $now->month, 1);
+
+        // 第1水曜日を取得
+        $firstWednesday = $firstDayOfMonth->copy()->next(\Carbon\Carbon::WEDNESDAY);
+
+        // 第2水曜日 = 第1水曜日 + 7日
+        $secondWednesday = $firstWednesday->copy()->addWeek();
+
+        // 今月の第2水曜日が過ぎている場合は、来月の第2水曜日を計算
+        if ($secondWednesday->isPast()) {
+            $nextMonth = $firstDayOfMonth->copy()->addMonth();
+            $firstDayOfNextMonth = \Carbon\Carbon::create($nextMonth->year, $nextMonth->month, 1);
+
+            // 来月の第1水曜日を取得
+            $firstWednesdayNextMonth = $firstDayOfNextMonth->copy()->next(\Carbon\Carbon::WEDNESDAY);
+
+            // 来月の第2水曜日
+            $secondWednesday = $firstWednesdayNextMonth->copy()->addWeek();
+        }
+
+        return [
+            'date' => $secondWednesday,
+            'formatted' => $secondWednesday->format('n月j日'),
+            'day_of_week' => $secondWednesday->format('(D)'),
+            'day_of_week_jp' => $this->getDayOfWeekJapanese($secondWednesday->dayOfWeek),
+        ];
+    }
+
+    /**
+     * 曜日を日本語で取得
+     */
+    private function getDayOfWeekJapanese($dayOfWeek)
+    {
+        $days = ['日', '月', '火', '水', '木', '金', '土'];
+        return $days[$dayOfWeek] ?? '';
     }
 }

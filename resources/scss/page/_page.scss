@@ -372,3 +372,107 @@
         font-family: "Noto Sans JP", sans-serif;
     }
 }
+
+// 同意事項セクション
+.agreement-section {
+    .agreement-content {
+        border: 1px solid #005FBE;
+        border-radius: 4px;
+        padding: 24px;
+        background-color: white;
+
+        .agreement-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #000;
+            font-family: "Noto Sans JP", sans-serif;
+            border-bottom: 2px solid #ED4141;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+        }
+
+        .agreement-text {
+            p {
+                font-size: 16px;
+                line-height: 1.7;
+                color: #000;
+                font-family: "Noto Sans JP", sans-serif;
+                margin-bottom: 8px;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+        }
+
+        .agreement-checkbox {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+    }
+}
+
+// 会員登録の案内セクション
+.membership-section {
+    .membership-content {
+        border: 1px solid #005FBE;
+        border-radius: 4px;
+        padding: 24px;
+        background-color: white;
+
+        .membership-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #000;
+            font-family: "Noto Sans JP", sans-serif;
+            border-bottom: 2px solid #ED4141;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+        }
+
+        .membership-text {
+            p {
+                font-size: 16px;
+                line-height: 1.7;
+                color: #000;
+                font-family: "Noto Sans JP", sans-serif;
+                margin-bottom: 8px;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+        }
+
+        .membership-checkbox {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+    }
+}
+
+// ナビゲーションボタン
+.navigation-buttons {
+    .c-btn-black {
+        display: block;
+        text-align: center;
+        padding: 12px 24px;
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 600;
+        font-family: "Noto Sans JP", sans-serif;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        display: inline-block;
+
+        &:hover {
+            background-color: #555;
+        }
+    }
+}

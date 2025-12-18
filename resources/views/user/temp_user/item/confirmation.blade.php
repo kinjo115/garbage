@@ -29,16 +29,18 @@
                 <div class="page-header">
                     <h1 class="page-title">申込内容の確認</h1>
                 </div>
-                <form action="">
+                <form action="#" method="POST" id="confirmation-form">
+                    @csrf
                     <div class="form-notification">まだ申込みは完了していません</div>
                     <div class="collection-date-content">
                         <div class="collection-date-content-title">
                             <h2>収集日が確定しました</h2>
                         </div>
                         <div class="collection-date-content-date">
-                            <p>10月25日(水)</p>
+                            <p>{{ $nextSecondWednesday['formatted'] }}（{{ $nextSecondWednesday['day_of_week_jp'] }}）</p>
                         </div>
-                        <input type="text" name="">
+                        <input type="hidden" name="collection_date"
+                            value="{{ $nextSecondWednesday['date']->format('Y-m-d') }}">
                     </div>
 
                     <div class="confirm-main-info mt-16">
@@ -136,7 +138,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mt-10">
+
+                        <div class="m-10">
                             <p>・基本情報または排出位置を変更したい場合は「基本情報に戻る」ボタンをクリックしてください。</p>
                             <p>・入力した品目内容を変更したい場合は「品目選択に戻る」ボタンをクリックしてください。</p>
                             <p>・申込みを中止したい場合は「申込みを中止する」ボタンをクリックしてください。</p>
@@ -144,6 +147,62 @@
                         </div>
                     </div>
 
+                    {{-- 同意事項セクション --}}
+                    <div class="agreement-section mt-16">
+                        <div class="agreement-content">
+                            <h2 class="agreement-title">同意事項</h2>
+                            <div class="agreement-text">
+                                <p>・排出位置を確認しました。</p>
+                                <p>(戸建て) 自宅前の道路上に排出します。</p>
+                                <p>(集合住宅) 決められた場所に排出します。</p>
+                                <p>※排出場所が不明な場合は、お住まいの区の環境事業所に確認をお願いします。</p>
+                                <p>・申し込む粗大ごみは、家庭から排出するものです。事業活動に伴うものではありません。</p>
+                            </div>
+                            <div class="agreement-checkbox">
+                                <label class="confirmation-checkbox">
+                                    <input type="checkbox" name="agree_terms" id="agree_terms" required>
+                                    <span>以上の内容に同意する</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- 会員登録の案内セクション --}}
+                    <div class="membership-section mt-16">
+                        <div class="membership-content">
+                            <h2 class="membership-title">会員登録の案内</h2>
+                            <div class="membership-text">
+                                <p>・会員登録を同時に行うことで、申込み完了時に仮パスワードが発行されます。</p>
+                                <p>・メールアドレスと仮パスワードで、マイページにログインでき、内容の変更やキャンセルがスムーズに可能です。</p>
+                                <p>・仮パスワードは、ログイン後に変更してご利用ください。</p>
+                                <p>・いつでも自由に退会できます。</p>
+                            </div>
+                            <div class="membership-checkbox">
+                                <label class="confirmation-checkbox">
+                                    <input type="checkbox" name="register_member" id="register_member">
+                                    <span>同時に会員登録を行う</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- ナビゲーションボタン --}}
+                    <div class="navigation-buttons mt-16">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <a href="{{ route('user.register.confirm.store.map', ['token' => $tempUser->token]) }}"
+                                class="c-btn-black">基本情報に戻る</a>
+                            <a href="{{ route('user.item.index', ['token' => $tempUser->token]) }}"
+                                class="c-btn-black">品目選択に戻る</a>
+                            <button type="button" class="c-btn-black" id="cancel-application-btn">申込みを中止する</button>
+                        </div>
+                    </div>
+
+                    {{-- 送信ボタン --}}
+                    <div class="form-submit mt-16">
+                        <button type="submit" class="c-button btn-416FED" id="proceed-payment-btn" disabled>
+                            支払い方法に進む
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -218,6 +277,45 @@
                     renderSelectedItems();
                 }
             }
+
+            // 同意事項チェックボックスの確認
+            $('#agree_terms').on('change', function() {
+                updateProceedButton();
+            });
+
+            // 支払い方法に進むボタンの有効/無効を更新
+            function updateProceedButton() {
+                const agreeChecked = $('#agree_terms').is(':checked');
+                $('#proceed-payment-btn').prop('disabled', !agreeChecked);
+            }
+
+            // フォーム送信時のバリデーション
+            $('#confirmation-form').on('submit', function(e) {
+                const agreeChecked = $('#agree_terms').is(':checked');
+
+                if (!agreeChecked) {
+                    e.preventDefault();
+                    Toastify({
+                        text: '「以上の内容に同意する」にチェックを入れてください。',
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "linear-gradient(to right, #ff6b6b, #ee5a6f)",
+                        }
+                    }).showToast();
+                    return false;
+                }
+            });
+
+            // 申込みを中止するボタン
+            $('#cancel-application-btn').on('click', function(e) {
+                e.preventDefault();
+                if (confirm('申込みを中止しますか？')) {
+                    // 申込み中止の処理（必要に応じて実装）
+                    window.location.href = '{{ route('home') }}';
+                }
+            });
 
             // 地図表示ロジック（確認ページ用、読み取り専用）
             @if (config('services.google_maps.api_key'))
