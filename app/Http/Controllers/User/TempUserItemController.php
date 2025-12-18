@@ -181,6 +181,44 @@ class TempUserItemController extends Controller
     }
 
     /**
+     * 確認ページの送信処理
+     */
+    public function confirmationStore(Request $request, $token)
+    {
+        $tempUser = TempUser::where('token', $token)->firstOrFail();
+
+        // 同意チェックボックスの確認
+        if (!$request->has('agree_terms') || !$request->input('agree_terms')) {
+            return back()->withErrors('「以上の内容に同意する」にチェックを入れてください。');
+        }
+
+        // 収集日の取得
+        $collectionDate = $request->input('collection_date');
+        if (empty($collectionDate)) {
+            return back()->withErrors('収集日が設定されていません。');
+        }
+
+        // selected_items テーブルを更新（収集日を保存）
+        $selected = SelectedItem::where('temp_user_id', $tempUser->id)
+            ->whereNull('user_id')
+            ->first();
+
+        if (!$selected) {
+            return redirect()
+                ->route('user.item.index', ['token' => $token])
+                ->with('error', '品目が選択されていません。');
+        }
+
+        $selected->collection_date = $collectionDate;
+        $selected->confirm_status = SelectedItem::CONFIRM_STATUS_CONFIRMED; // 確認済み
+        $selected->save();
+
+        return redirect()
+            ->route('user.payment.index', ['token' => $token])
+            ->with('success', '申込内容を確認しました。支払い方法を選択してください。');
+    }
+
+    /**
      * 曜日を日本語で取得
      */
     private function getDayOfWeekJapanese($dayOfWeek)

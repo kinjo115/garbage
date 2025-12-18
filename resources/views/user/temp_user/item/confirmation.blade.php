@@ -29,7 +29,8 @@
                 <div class="page-header">
                     <h1 class="page-title">申込内容の確認</h1>
                 </div>
-                <form action="#" method="POST" id="confirmation-form">
+                <form action="{{ route('user.confirmation.store', ['token' => $tempUser->token]) }}" method="POST"
+                    id="confirmation-form">
                     @csrf
                     <div class="form-notification">まだ申込みは完了していません</div>
                     <div class="collection-date-content">

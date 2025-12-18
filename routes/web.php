@@ -10,6 +10,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\User\AuthenticationController as UserAuthenticationController;
 use App\Http\Controllers\User\TempUserController as UserTempUserController;
 use App\Http\Controllers\User\TempUserItemController as UserTempUserItemController;
+use App\Http\Controllers\User\TempUserPaymentController as UserTempUserPaymentController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -35,6 +36,12 @@ Route::prefix('user')->name('user.')->middleware('guest')->group(function () {
     });
 
     Route::get('confirmation/token/{token}', [UserTempUserItemController::class, 'confirmationIndex'])->name('confirmation.index');
+    Route::post('confirmation/token/{token}', [UserTempUserItemController::class, 'confirmationStore'])->name('confirmation.store');
+
+    Route::prefix('payment')->name('payment.')->group(function () {
+        Route::get('token/{token}', [UserTempUserPaymentController::class, 'index'])->name('index');
+        Route::post('token/{token}', [UserTempUserPaymentController::class, 'store'])->name('store');
+    });
 });
 
 // Route::view('dashboard', 'dashboard')
