@@ -39,6 +39,16 @@
         color: #000000;
     }
 
+    .form-notification {
+        font-size: 28px;
+        font-weight: bold;
+        color: #D00000;
+        border: 1px solid #D00000;
+        text-align: center;
+        padding: 16px 20px;
+        border-radius: 7px;
+    }
+
 
     .form-group {
         margin-bottom: 20px;
@@ -135,5 +145,229 @@
             background-color: #f5f5f5;
             border-radius: 4px;
         }
+    }
+}
+
+.selected-items {
+    .selected-items-header {
+        margin: 20px 0px;
+
+        .selected-items-title {
+            font-size: 32px;
+            font-weight: 600;
+            font-family: "Noto Sans JP", sans-serif;
+            color: #000000;
+            text-align: center;
+        }
+    }
+
+    .selected-items-body {
+        padding: 40px 20px;
+        border: 1px solid #707070;
+
+        .selected-items-wrapper {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+
+            .selected-item {
+                position: relative;
+                padding: 16px 24px;
+                border: 2px solid #005FBE;
+                border-radius: 7px;
+
+                .selected-item-name {
+                    font-size: 21px;
+                    font-weight: 600;
+                    font-family: "Noto Sans JP", sans-serif;
+                    color: #005FBE;
+                }
+
+                .quantity-wrapper {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+
+                    .count {
+                        font-size: 24px;
+                        font-weight: 600;
+                        font-family: "Noto Sans JP", sans-serif;
+                        color: #000;
+                    }
+
+                    .decrease-button,
+                    .increase-button {
+                        width: 40px;
+                        height: 40px;
+                        cursor: pointer;
+
+                        &:hover {
+                            opacity: 0.8;
+                        }
+
+                        img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: contain;
+                        }
+                    }
+                }
+
+                .delete-button {
+                    position: absolute;
+                    bottom: 10px;
+                    right: 10px;
+
+                    .delete-button-icon {
+                        cursor: pointer;
+                        width: 30px;
+                        height: 30px;
+
+                        img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: contain;
+                        }
+
+                        &:hover {
+                            opacity: 0.8;
+                        }
+                    }
+                }
+
+                .selected-item-amount {
+                    font-size: 18px;
+                    font-weight: 600;
+                    font-family: "Noto Sans JP", sans-serif;
+                    color: #005FBE;
+                }
+            }
+        }
+    }
+
+    .total-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 20px;
+        padding: 20px 24px;
+        border: 1px solid #ED4141;
+        border-radius: 7px;
+
+        .total-content-title {
+            font-size: 21px;
+            font-weight: 600;
+            font-family: "Noto Sans JP", sans-serif;
+            color: #ED4141;
+        }
+
+        .total-content-amount {
+            font-size: 21px;
+            font-weight: 600;
+            font-family: "Noto Sans JP", sans-serif;
+            color: #ED4141;
+        }
+    }
+}
+
+.item-list-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+
+    .item-list-item {
+        padding: 16px 24px;
+        border: 2px solid #005FBE;
+        border-radius: 7px;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #f0f0f0;
+        }
+
+        .item-list-item-name {
+            font-size: 21px;
+            font-weight: 600;
+            font-family: "Noto Sans JP", sans-serif;
+            color: #005FBE;
+        }
+
+        .item-list-item-price {
+            font-size: 18px;
+            font-weight: 600;
+            font-family: "Noto Sans JP", sans-serif;
+            color: #005FBE;
+        }
+
+        .category-wrapper {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+
+            .category-item {
+                font-size: 15px;
+                font-weight: 600;
+                font-family: "Noto Sans JP", sans-serif;
+                color: #000;
+            }
+        }
+
+        .description-wrapper {
+            margin-top: 10px;
+
+            .label {
+                position: relative;
+                padding: 5px 10px;
+                font-size: 15px;
+                font-weight: 600;
+                font-family: "Noto Sans JP", sans-serif;
+                color: white;
+                background-color: #0B4BC3;
+
+                &::after {
+                    content: '';
+                    position: absolute;
+                    right: 10px;
+                    bottom: 10px;
+                    width: 18px;
+                    height: 16px;
+                    background-image: url('../../assets/images/icons/arrow-bottom-write.svg');
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                    background-position: center;
+                }
+            }
+
+            .description-item {
+                margin-top: 10px;
+                font-size: 14px;
+                padding: 0px 10px;
+            }
+        }
+    }
+}
+
+.collection-date-content {
+    margin-top: 40px;
+    background-color: #5555F5;
+    padding: 40px;
+    text-align: center;
+
+    .collection-date-content-title {
+        font-size: 29px;
+        color: white;
+        font-weight: bold;
+        font-family: "Noto Sans JP", sans-serif;
+    }
+
+    .collection-date-content-date {
+        margin-top: 60px;
+        font-size: 50px;
+        color: white;
+        font-weight: bold;
+        font-family: "Noto Sans JP", sans-serif;
     }
 }

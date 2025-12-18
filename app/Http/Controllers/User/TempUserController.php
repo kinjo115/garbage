@@ -73,6 +73,10 @@ class TempUserController extends Controller
                 ]
             );
 
+            // TempUserのステータスを更新（登録完了）
+            $tempUser->update([
+                'status' => 1, // 1: 登録完了
+            ]);
 
             // パスワード通知メールを送信（必要に応じて）
             // SendMessageJob::dispatch($user->email, 'アカウント登録が完了しました', 'mails.user.auth.password_notification', [
@@ -218,10 +222,7 @@ class TempUserController extends Controller
 
             DB::commit();
 
-            // 次のステップ（品目入力画面）へリダイレクト
-            // 品目入力画面がまだない場合は、完了画面や次のステップにリダイレクト
-            // 一時的にホームにリダイレクト（品目入力画面が作成されたら変更）
-            return redirect()->route('home')
+            return redirect()->route('user.item.index', ['token' => $token])
                 ->with('success', '地図登録が完了しました。品目入力画面は準備中です。');
         } catch (\Exception $e) {
             DB::rollBack();

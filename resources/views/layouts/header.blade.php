@@ -1,8 +1,8 @@
 <header class="p-header">
     <div class="inner-wrapper">
-        <div class="c-logo">
+        <a href="{{ route('home') }}" class="c-logo">
             <img src="{{ asset('assets/images/logo.png') }}" alt="logo">
-        </div>
+        </a>
 
         <div class="info">
             <p>フリーダイヤル：0120-758-530</p>

@@ -376,5 +376,198 @@ $(document).ready(function() {
             $(this).val(value);
         }
     });
+
+    /**
+     * 品目選択ロジック（user.temp_user.item.index）
+     */
+    const $itemsForm = $('#items-form');
+    if ($itemsForm.length) {
+        let selectedItems = [];
+
+        // 初期選択データがあれば読み込む（selected_items テーブルから）
+        const initialItemsAttr = $itemsForm.attr('data-initial-items');
+        if (initialItemsAttr) {
+            try {
+                const parsed = JSON.parse(initialItemsAttr);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    selectedItems = parsed.map(function(item) {
+                        return {
+                            id: item.id,
+                            name: item.name,
+                            price: item.price,
+                            quantity: item.quantity,
+                        };
+                    });
+                }
+            } catch (e) {
+                console.warn('初期品目データのパースに失敗しました', e);
+            }
+        }
+
+        const $selectedWrapper = $('#selected-items-wrapper');
+        const $totalAmount = $('#total-content-amount');
+
+        /**
+         * 選択済み一覧を再描画
+         */
+        function renderSelectedItems() {
+            $selectedWrapper.empty();
+
+            let totalPrice = 0;
+            let totalCount = 0;
+
+            selectedItems.forEach(function(item) {
+                const itemTotal = item.price * item.quantity;
+                totalPrice += itemTotal;
+                totalCount += item.quantity;
+
+                const $itemEl = $(`
+                    <div class="selected-item" data-item-id="${item.id}">
+                        <div class="flex items-end justify-between">
+                            <div class="selected-item-name">${item.name}</div>
+                            <div class="selected-item-amount">${itemTotal.toLocaleString()}円</div>
+                        </div>
+                        <div class="flex">
+                            <div class="quantity-wrapper mt-10">
+                                <button type="button" class="decrease-button">
+                                    <img src="/assets/images/icons/icon-minus.svg" alt="マイナス">
+                                </button>
+                                <input type="number" value="${item.quantity}" class="quantity-input" hidden>
+                                <div class="count">${item.quantity}</div>
+                                <button type="button" class="increase-button">
+                                    <img src="/assets/images/icons/icon-plus.svg" alt="プラス">
+                                </button>
+                            </div>
+                            <div class="delete-button">
+                                <button type="button" class="delete-button-icon">
+                                    <img src="/assets/images/icons/trash.svg" alt="削除">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `);
+
+                $selectedWrapper.append($itemEl);
+            });
+
+            $totalAmount.html(`${totalPrice.toLocaleString()}円 <span class="text-sm">(${totalCount}個)</span>`);
+        }
+
+        /**
+         * 品目カードクリックで選択リストに追加
+         * （カード全体をクリック可能にして、クリック漏れを防ぐ）
+         */
+        $(document).on('click', '.item-list-item', function(e) {
+            // もし将来「説明表示」など別アクションを追加した場合に備えて必要なら除外
+            if ($(e.target).closest('.no-add').length) {
+                return;
+            }
+
+            const $parent = $(this);
+            const id = parseInt($parent.data('item-id'), 10);
+            const name = $parent.data('item-name');
+            const price = parseInt($parent.data('item-price'), 10);
+
+            if (!id || !name || isNaN(price)) {
+                console.warn('品目情報が不正です', {
+                    id,
+                    name,
+                    price
+                });
+                return;
+            }
+
+            const existing = selectedItems.find(function(i) {
+                return i.id === id;
+            });
+
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                selectedItems.push({
+                    id: id,
+                    name: name,
+                    price: price,
+                    quantity: 1,
+                });
+            }
+
+            renderSelectedItems();
+        });
+
+        /**
+         * 数量変更（+ / -）
+         */
+        $selectedWrapper.on('click', '.increase-button', function() {
+            const $itemEl = $(this).closest('.selected-item');
+            const id = parseInt($itemEl.data('item-id'), 10);
+
+            const target = selectedItems.find(function(i) {
+                return i.id === id;
+            });
+            if (!target) return;
+
+            target.quantity += 1;
+            renderSelectedItems();
+        });
+
+        $selectedWrapper.on('click', '.decrease-button', function() {
+            const $itemEl = $(this).closest('.selected-item');
+            const id = parseInt($itemEl.data('item-id'), 10);
+
+            const target = selectedItems.find(function(i) {
+                return i.id === id;
+            });
+            if (!target) return;
+
+            if (target.quantity > 1) {
+                target.quantity -= 1;
+            } else {
+                // 1未満にはしない（削除はゴミ箱ボタンで）
+                return;
+            }
+            renderSelectedItems();
+        });
+
+        /**
+         * 品目削除
+         */
+        $selectedWrapper.on('click', '.delete-button-icon', function() {
+            const $itemEl = $(this).closest('.selected-item');
+            const id = parseInt($itemEl.data('item-id'), 10);
+
+            selectedItems = selectedItems.filter(function(i) {
+                return i.id !== id;
+            });
+
+            renderSelectedItems();
+        });
+
+        /**
+         * 送信前にJSONとしてhiddenに詰める
+         */
+        $itemsForm.on('submit', function(e) {
+            if (selectedItems.length === 0) {
+                e.preventDefault();
+                Toastify({
+                    text: '少なくとも1つの品目を選択してください。',
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "linear-gradient(to right, #ff6b6b, #ee5a6f)",
+                    }
+                }).showToast();
+                return false;
+            }
+
+            $('#items-json').val(JSON.stringify(selectedItems));
+        });
+
+        // 初期データがあれば描画
+        if (selectedItems.length > 0) {
+            renderSelectedItems();
+        }
+    }
 });
 
