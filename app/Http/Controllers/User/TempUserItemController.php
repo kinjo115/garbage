@@ -124,6 +124,8 @@ class TempUserItemController extends Controller
             ->whereNull('user_id')
             ->first();
 
-        return view('user.temp_user.item.confirmation', compact('tempUser', 'selected'));
+        $initialSelectedItems = $selected?->selected_items ?? [];
+
+        return view('user.temp_user.item.confirmation', compact('tempUser', 'selected', 'initialSelectedItems'));
     }
 }
