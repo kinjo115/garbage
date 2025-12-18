@@ -167,25 +167,6 @@
                         </div>
                     </div>
 
-                    {{-- 会員登録の案内セクション --}}
-                    <div class="membership-section mt-16">
-                        <div class="membership-content">
-                            <h2 class="membership-title">会員登録の案内</h2>
-                            <div class="membership-text">
-                                <p>・会員登録を同時に行うことで、申込み完了時に仮パスワードが発行されます。</p>
-                                <p>・メールアドレスと仮パスワードで、マイページにログインでき、内容の変更やキャンセルがスムーズに可能です。</p>
-                                <p>・仮パスワードは、ログイン後に変更してご利用ください。</p>
-                                <p>・いつでも自由に退会できます。</p>
-                            </div>
-                            <div class="membership-checkbox">
-                                <label class="confirmation-checkbox">
-                                    <input type="checkbox" name="register_member" id="register_member">
-                                    <span>同時に会員登録を行う</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
                     {{-- ナビゲーションボタン --}}
                     <div class="navigation-buttons mt-16">
                         <div class="flex flex-wrap gap-4 justify-center">
