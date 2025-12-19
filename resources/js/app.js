@@ -430,17 +430,17 @@ $(document).ready(function() {
                         <div class="flex">
                             <div class="quantity-wrapper mt-10">
                                 <button type="button" class="decrease-button">
-                                    <img src="/assets/images/icons/icon-minus.svg" alt="マイナス">
+                                    <img src="${window.assetUrls?.iconMinus || '/assets/images/icons/icon-minus.svg'}" alt="マイナス">
                                 </button>
                                 <input type="number" value="${item.quantity}" class="quantity-input" hidden>
                                 <div class="count">${item.quantity}</div>
                                 <button type="button" class="increase-button">
-                                    <img src="/assets/images/icons/icon-plus.svg" alt="プラス">
+                                    <img src="${window.assetUrls?.iconPlus || '/assets/images/icons/icon-plus.svg'}" alt="プラス">
                                 </button>
                             </div>
                             <div class="delete-button">
                                 <button type="button" class="delete-button-icon">
-                                    <img src="/assets/images/icons/trash.svg" alt="削除">
+                                    <img src="${window.assetUrls?.trash || '/assets/images/icons/trash.svg'}" alt="削除">
                                 </button>
                             </div>
                         </div>

@@ -9,6 +9,15 @@
 
     @yield('meta')
 
+    <script>
+        // Asset URLs for JavaScript
+        window.assetUrls = {
+            iconMinus: '{{ asset("assets/images/icons/icon-minus.svg") }}',
+            iconPlus: '{{ asset("assets/images/icons/icon-plus.svg") }}',
+            trash: '{{ asset("assets/images/icons/trash.svg") }}',
+        };
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
