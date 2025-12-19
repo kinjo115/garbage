@@ -20,6 +20,12 @@
                 決済情報
             </h2>
 
+            @if (isset($mailInfo['reception_number']))
+                <p style="font-size: 16px; margin-bottom: 10px;">
+                    <strong>受付番号:</strong> <span style="font-size: 18px; font-weight: 600; color: #416FED;">{{ $mailInfo['reception_number'] }}</span>
+                </p>
+            @endif
+
             @if (isset($mailInfo['order_id']))
                 <p style="font-size: 16px; margin-bottom: 10px;">
                     <strong>注文番号:</strong> {{ $mailInfo['order_id'] }}

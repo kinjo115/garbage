@@ -15,14 +15,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         ]);
+
+        // CSRF exemption for payment callbacks (external payment gateway)
+        $middleware->validateCsrfTokens(except: [
+            'guest/payment/callback/token/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })
     ->withSchedule(function (Schedule $schedule): void {
-        // Run the queue worker every minute and stop when the queue is empty
-        $schedule->command('queue:work --tries=1 --stop-when-empty')
-            ->everyMinute()
-            ->withoutOverlapping();
+
     })
     ->create();

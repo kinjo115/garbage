@@ -49,13 +49,16 @@ return [
 
     // GMOペイメント設定
     'gmo_payment' => (function () {
-        $apiUrl = env('GMO_PAYMENT_API_URL', 'https://kt01.mul-pay.jp/payment');
+        $apiUrl = env('GMO_PAYMENT_API_URL', 'https://pt01.mul-pay.jp/payment');
         return [
             'site_id' => env('GMO_PAYMENT_SITE_ID'),
             'site_pass' => env('GMO_PAYMENT_SITE_PASS'),
             'shop_id' => env('GMO_PAYMENT_SHOP_ID'),
             'shop_pass' => env('GMO_PAYMENT_SHOP_PASS'),
+            'config_id' => env('GMO_PAYMENT_CONFIG_ID', '001'),
             'api_url' => $apiUrl,
+            'get_linkplus_url' => env('GMO_PAYMENT_GET_LINKPLUS_URL', rtrim($apiUrl, '/') . '/GetLinkplusUrl.idPass'),
+            // 旧API（後方互換性のため保持）
             'entry_url' => env('GMO_PAYMENT_ENTRY_URL', rtrim($apiUrl, '/') . '/EntryTran.idPass'),
             'exec_url' => env('GMO_PAYMENT_EXEC_URL', rtrim($apiUrl, '/') . '/ExecTran.idPass'),
             'return_url' => env('GMO_PAYMENT_RETURN_URL', '/user/payment/callback'),

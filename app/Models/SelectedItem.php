@@ -20,6 +20,7 @@ class SelectedItem extends Model
         'total_amount',
         'collection_date',
         'confirm_status',
+        'reception_number_serial',
     ];
 
     protected $casts = [
@@ -35,5 +36,22 @@ class SelectedItem extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * 受付番号を取得（YYMM-00001形式）
+     */
+    public function getReceptionNumberAttribute(): ?string
+    {
+        if (!$this->reception_number_serial || !$this->payment_date) {
+            return null;
+        }
+
+        $paymentDate = \Carbon\Carbon::parse($this->payment_date);
+        $yy = $paymentDate->format('y'); // 2桁の年
+        $mm = $paymentDate->format('m'); // 2桁の月
+        $serial = str_pad($this->reception_number_serial, 5, '0', STR_PAD_LEFT);
+
+        return $yy . $mm . '-' . $serial;
     }
 }

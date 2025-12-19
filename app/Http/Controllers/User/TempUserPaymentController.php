@@ -125,50 +125,49 @@ class TempUserPaymentController extends Controller
         $selected->save();
 
         try {
-            // EntryTran リクエストパラメータの準備
-            // GMO APIは数値パラメータも文字列として送信する必要がある場合がある
-            $entryParams = [
+            // GetLinkplusUrl API リクエストパラメータの準備
+            $requestParams = [
                 'ShopID' => $config['shop_id'],
                 'ShopPass' => $config['shop_pass'],
+                'ConfigID' => $config['config_id'] ?? '001',
                 'OrderID' => $orderId,
-                'Amount' => (string)$amount, // 文字列として送信
-                'Tax' => '0', // 税額（今回は0、文字列として送信）
+                'Amount' => $amount,
+                'Tax' => 0,
+                'RetURL' => route('guest.payment.callback', ['token' => $tempUser->token]),
+                'JobCd' => 'CAPTURE', // 即時決済
             ];
 
             // デバッグ用ログ（パスワードはマスク）
-            Log::info('GMO EntryTran Request', [
+            Log::info('GMO GetLinkplusUrl Request', [
                 'ShopID' => $config['shop_id'],
                 'ShopPass' => !empty($config['shop_pass']) ? '***' : 'EMPTY',
                 'ShopPass_length' => strlen($config['shop_pass'] ?? ''),
+                'ConfigID' => $requestParams['ConfigID'],
                 'OrderID' => $orderId,
                 'OrderID_length' => strlen($orderId),
                 'Amount' => $amount,
-                'Amount_type' => gettype($entryParams['Amount']),
-                'Tax' => $entryParams['Tax'],
-                'Tax_type' => gettype($entryParams['Tax']),
-                'URL' => $config['entry_url'],
-                'AllParams' => array_map(function ($key, $value) {
-                    return $key === 'ShopPass' ? '***' : $value;
-                }, array_keys($entryParams), $entryParams),
+                'Tax' => $requestParams['Tax'],
+                'RetURL' => $requestParams['RetURL'],
+                'URL' => $config['get_linkplus_url'],
             ]);
 
-            /** Step1: EntryTran - 取引登録 */
-            $entryResponse = Http::asForm()
+            /** GetLinkplusUrl API - 決済URL取得（単一ステップ） */
+            $response = Http::asForm()
                 ->timeout(30)
-                ->post($config['entry_url'], $entryParams);
+                ->post($config['get_linkplus_url'], $requestParams);
 
             // 実際に送信されたリクエストの詳細をログに記録
-            Log::info('GMO EntryTran Response', [
-                'status_code' => $entryResponse->status(),
-                'response_body' => $entryResponse->body(),
-                'response_headers' => $entryResponse->headers(),
+            Log::info('GMO GetLinkplusUrl Response', [
+                'status_code' => $response->status(),
+                'response_body' => $response->body(),
+                'response_headers' => $response->headers(),
             ]);
 
             // HTTPステータスコードの確認
-            if (!$entryResponse->successful()) {
-                Log::error('GMO EntryTran HTTP Error', [
-                    'status_code' => $entryResponse->status(),
-                    'body' => $entryResponse->body(),
+            if (!$response->successful()) {
+                Log::error('GMO GetLinkplusUrl HTTP Error', [
+                    'status_code' => $response->status(),
+                    'body' => $response->body(),
                     'OrderID' => $orderId,
                 ]);
 
@@ -177,29 +176,23 @@ class TempUserPaymentController extends Controller
                     ->with('error', '決済サーバーへの接続に失敗しました。');
             }
 
-            parse_str($entryResponse->body(), $entryResult);
+            parse_str($response->body(), $result);
 
             // エラーチェック
-            if (isset($entryResult['ErrCode']) && !empty($entryResult['ErrCode'])) {
-                Log::error('GMO EntryTran Error', [
-                    'ErrCode' => $entryResult['ErrCode'] ?? null,
-                    'ErrInfo' => $entryResult['ErrInfo'] ?? null,
+            if (isset($result['ErrCode']) && !empty($result['ErrCode'])) {
+                Log::error('GMO GetLinkplusUrl Error', [
+                    'ErrCode' => $result['ErrCode'] ?? null,
+                    'ErrInfo' => $result['ErrInfo'] ?? null,
                     'OrderID' => $orderId,
                     'Amount' => $amount,
                     'ShopID' => $config['shop_id'],
                     'ShopPass_set' => !empty($config['shop_pass']),
-                    'Response' => $entryResponse->body(),
-                    'RequestParams' => [
-                        'ShopID' => $config['shop_id'],
-                        'OrderID' => $orderId,
-                        'Amount' => $amount,
-                        'Tax' => 0,
-                    ],
+                    'Response' => $response->body(),
                 ]);
 
                 $errorMessage = '決済処理の開始に失敗しました。';
-                if (isset($entryResult['ErrInfo'])) {
-                    $errorMessage .= ' エラー: ' . $entryResult['ErrInfo'];
+                if (isset($result['ErrInfo'])) {
+                    $errorMessage .= ' エラー: ' . $result['ErrInfo'];
                 }
 
                 return redirect()
@@ -207,53 +200,10 @@ class TempUserPaymentController extends Controller
                     ->with('error', $errorMessage);
             }
 
-            if (!isset($entryResult['AccessID']) || !isset($entryResult['AccessPass'])) {
-                Log::error('GMO EntryTran Missing AccessID/AccessPass', [
-                    'Response' => $entryResponse->body(),
-                    'Parsed' => $entryResult,
-                ]);
-
-                return redirect()
-                    ->route('guest.payment.index', ['token' => $tempUser->token])
-                    ->with('error', '決済処理の開始に失敗しました。');
-            }
-
-            /** Step2: ExecTran - 決済実行（リンクタイプPlus） */
-            $execResponse = Http::asForm()->post($config['exec_url'], [
-                'SiteID' => $config['site_id'],
-                'SitePass' => $config['site_pass'],
-                'AccessID' => $entryResult['AccessID'],
-                'AccessPass' => $entryResult['AccessPass'],
-                'OrderID' => $orderId,
-                'Method' => '1', // 一括
-                'RetURL' => route('guest.payment.callback', ['token' => $tempUser->token]),
-                'CancelURL' => route('guest.payment.cancel', ['token' => $tempUser->token]),
-                'ClientField1' => $tempUser->token ?? '', // トークンを保持
-                'ClientField2' => (string)$selected->id, // SelectedItem IDを保持
-                'ClientField3' => '', // 追加フィールド
-            ]);
-
-            parse_str($execResponse->body(), $execResult);
-
-            // エラーチェック
-            if (isset($execResult['ErrCode']) && !empty($execResult['ErrCode'])) {
-                Log::error('GMO ExecTran Error', [
-                    'ErrCode' => $execResult['ErrCode'] ?? null,
-                    'ErrInfo' => $execResult['ErrInfo'] ?? null,
-                    'OrderID' => $orderId,
-                    'AccessID' => $entryResult['AccessID'],
-                    'Response' => $execResponse->body(),
-                ]);
-
-                return redirect()
-                    ->route('guest.payment.index', ['token' => $tempUser->token])
-                    ->with('error', '決済処理の実行に失敗しました。エラーコード: ' . ($execResult['ErrCode'] ?? 'UNKNOWN'));
-            }
-
-            if (!isset($execResult['StartURL'])) {
-                Log::error('GMO ExecTran Missing StartURL', [
-                    'Response' => $execResponse->body(),
-                    'Parsed' => $execResult,
+            if (!isset($result['StartURL'])) {
+                Log::error('GMO GetLinkplusUrl Missing StartURL', [
+                    'Response' => $response->body(),
+                    'Parsed' => $result,
                 ]);
 
                 return redirect()
@@ -262,7 +212,7 @@ class TempUserPaymentController extends Controller
             }
 
             // GMO決済画面へリダイレクト
-            return redirect($execResult['StartURL']);
+            return redirect($result['StartURL']);
         } catch (\Exception $e) {
             Log::error('GMO Payment Exception', [
                 'message' => $e->getMessage(),
@@ -283,14 +233,41 @@ class TempUserPaymentController extends Controller
     {
         $tempUser = TempUser::where('token', $token)->firstOrFail();
 
-        $selected = SelectedItem::where('temp_user_id', $tempUser->id)
-            ->whereNull('user_id')
-            ->first();
+        // GMOペイメントからのレスポンスを確認
+        $orderId = $request->input('OrderID');
+        $status = $request->input('Status');
+        $accessId = $request->input('AccessID');
+        $errCode = $request->input('ErrCode');
+        $errInfo = $request->input('ErrInfo');
+
+        // SelectedItemを検索（transaction_idで検索するか、temp_user_idで検索）
+        $selected = null;
+        if ($orderId) {
+            // まずtransaction_idで検索（より確実）
+            $selected = SelectedItem::where('transaction_id', $orderId)
+                ->where('temp_user_id', $tempUser->id)
+                ->first();
+        }
+
+        // transaction_idで見つからない場合、temp_user_idで検索
+        if (!$selected) {
+            $selected = SelectedItem::where('temp_user_id', $tempUser->id)
+                ->whereNull('user_id')
+                ->first();
+        }
+
+        // それでも見つからない場合、user_idが設定されている場合も含めて検索
+        if (!$selected) {
+            $selected = SelectedItem::where('temp_user_id', $tempUser->id)
+                ->where('transaction_id', $orderId)
+                ->first();
+        }
 
         if (!$selected) {
             Log::error('GMO Callback: SelectedItem not found', [
                 'token' => $token,
                 'temp_user_id' => $tempUser->id,
+                'order_id' => $orderId,
                 'request_params' => $request->all(),
             ]);
 
@@ -298,13 +275,6 @@ class TempUserPaymentController extends Controller
                 ->route('home')
                 ->with('error', '決済情報が見つかりませんでした。');
         }
-
-        // GMOペイメントからのレスポンスを確認
-        $orderId = $request->input('OrderID');
-        $status = $request->input('Status');
-        $accessId = $request->input('AccessID');
-        $errCode = $request->input('ErrCode');
-        $errInfo = $request->input('ErrInfo');
 
         // エラーログ記録
         if (!empty($errCode)) {
@@ -325,6 +295,18 @@ class TempUserPaymentController extends Controller
                 ->with('error', '決済に失敗しました。エラーコード: ' . $errCode . '。もう一度お試しください。');
         }
 
+        // 既に決済が完了している場合は、完了ページにリダイレクト（重複処理を防ぐ）
+        if ($selected->payment_status === 2 && $selected->payment_date) {
+            Log::info('GMO Callback: Payment already processed', [
+                'OrderID' => $orderId,
+                'selected_item_id' => $selected->id,
+            ]);
+
+            return redirect()
+                ->route('guest.payment.complete', ['token' => $token])
+                ->with('info', '決済は既に完了しています。');
+        }
+
         // 決済成功の判定
         // GMOペイメントのStatus: CAPTURE(即時決済完了), AUTH(仮売上)
         if ($status === 'CAPTURE' || $status === 'AUTH') {
@@ -334,6 +316,14 @@ class TempUserPaymentController extends Controller
                 // 決済成功
                 $selected->payment_status = 2; // paid
                 $selected->payment_date = now();
+
+                // 受付番号のシリアル番号を生成（申請IDの下5桁）
+                if (!$selected->reception_number_serial) {
+                    $selectedId = (string)$selected->id;
+                    $last5Digits = substr($selectedId, -5); // 下5桁を取得
+                    $selected->reception_number_serial = str_pad($last5Digits, 5, '0', STR_PAD_LEFT); // 5桁にゼロパディング
+                }
+
                 $selected->save();
 
                 // ユーザー情報を取得
@@ -413,6 +403,13 @@ class TempUserPaymentController extends Controller
                     $paymentMethodName = 'コンビニ決済';
                 }
 
+                // 受付番号を生成（YYMM-00001形式）
+                $paymentDate = Carbon::now();
+                $yy = $paymentDate->format('y'); // 2桁の年
+                $mm = $paymentDate->format('m'); // 2桁の月
+                $serial = $selected->reception_number_serial ?? '00001';
+                $receptionNumber = $yy . $mm . '-' . $serial;
+
                 SendMessageJob::dispatch(
                     $email,
                     '決済が完了しました',
@@ -421,7 +418,8 @@ class TempUserPaymentController extends Controller
                         'name' => $userName,
                         'email' => $email,
                         'order_id' => $orderId,
-                        'payment_date' => Carbon::now()->format('Y年n月j日 H:i'),
+                        'reception_number' => $receptionNumber,
+                        'payment_date' => $paymentDate->format('Y年n月j日 H:i'),
                         'payment_amount' => $selected->total_amount,
                         'payment_method' => $paymentMethodName,
                         'collection_date' => $collectionDate,
@@ -478,6 +476,38 @@ class TempUserPaymentController extends Controller
                 ->route('guest.payment.index', ['token' => $token])
                 ->with('error', '決済に失敗しました。もう一度お試しください。');
         }
+    }
+
+    /**
+     * コンビニ決済ページ
+     */
+    public function convenience($token)
+    {
+        $tempUser = TempUser::where('token', $token)->firstOrFail();
+
+        $selected = SelectedItem::where('temp_user_id', $tempUser->id)
+            ->whereNull('user_id')
+            ->first();
+
+        if (!$selected) {
+            return redirect()
+                ->route('guest.item.index', ['token' => $token])
+                ->with('error', '品目が選択されていません。');
+        }
+
+        if ($selected->confirm_status !== SelectedItem::CONFIRM_STATUS_CONFIRMED) {
+            return redirect()
+                ->route('guest.confirmation.index', ['token' => $token])
+                ->with('error', '申込内容が確認されていません。申込内容の確認ページに戻ってください。');
+        }
+
+        // コンビニ決済の処理（後で実装）
+        // 現在は一時的に支払い方法を保存して完了ページにリダイレクト
+        $selected->payment_method = 'convenience';
+        $selected->payment_status = 1; // pending
+        $selected->save();
+
+        return view('user.temp_user.payment.convenience', compact('tempUser', 'selected'));
     }
 
     /**
