@@ -154,6 +154,12 @@ class TempUserPaymentController extends Controller
             /** GetLinkplusUrl API - 決済URL取得（単一ステップ） */
             $response = Http::asForm()
                 ->timeout(30)
+                ->withOptions([
+                    'curl' => [
+                        CURLOPT_SSL_VERIFYPEER => true,
+                        CURLOPT_SSL_VERIFYHOST => 2,
+                    ],
+                ])
                 ->post($config['get_linkplus_url'], $requestParams);
 
             // 実際に送信されたリクエストの詳細をログに記録
