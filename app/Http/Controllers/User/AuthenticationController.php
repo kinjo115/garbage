@@ -29,7 +29,7 @@ class AuthenticationController extends Controller
             return redirect()->route('home');
         }
 
-        return redirect()->route('user.login')->with('error', __('auth.failed'));
+        return redirect()->route('guest.login')->with('error', __('auth.failed'));
     }
 
     public function createRegister()
@@ -68,7 +68,7 @@ class AuthenticationController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return redirect()->route('user.register')
+            return redirect()->route('guest.register')
                 ->with('error', __('messages.register_failed'));
         }
     }

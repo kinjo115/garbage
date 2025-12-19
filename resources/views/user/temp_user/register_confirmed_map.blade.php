@@ -8,7 +8,7 @@
     <meta property="og:title" content="地図登録 | 名古屋市ゴミ収集サイト">
     <meta property="og:description" content="地図登録 | 名古屋市ゴミ収集サイト">
     <meta property="og:image" content="{{ asset('assets/images/ogp.png') }}">
-    <meta property="og:url" content="{{ route('user.register.confirm.store.map', ['token' => $tempUser->token]) }}">
+    <meta property="og:url" content="{{ route('guest.register.confirm.store.map', ['token' => $tempUser->token]) }}">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ja_JP">
     <meta property="og:site_name" content="名古屋市ゴミ収集サイト">
@@ -53,7 +53,7 @@
                     <p>・位置の指定方法が分からない場合や、地図上で位置を確認できない場合は、「場所の指定ができない」ボタンをクリックして申し込みを中止し、電話でお申し込みください。</p>
                     <p>・排出位置は選択していただいた場所から修正させていただくことがございますので、必ず前日お知らせメールで排出位置をご確認ください</p>
                 </div>
-                <form action="{{ route('user.register.confirm.store.map.save', ['token' => $tempUser->token]) }}"
+                <form action="{{ route('guest.register.confirm.store.map.save', ['token' => $tempUser->token]) }}"
                     method="POST" class="mt-10" id="map-form">
                     @csrf
                     <div class="form-group">
@@ -115,7 +115,7 @@
                         </div>
 
                         <div class="md:mt-16 mt-10 flex justify-center">
-                            <a href="{{ route('user.register.confirm', ['token' => $tempUser->token]) }}"
+                            <a href="{{ route('guest.register.confirm', ['token' => $tempUser->token]) }}"
                                 class="c-btn-black">戻る</a>
                         </div>
                     </div>
@@ -514,7 +514,7 @@
                         const form = document.createElement('form');
                         form.method = 'POST';
                         form.action =
-                            '{{ route('user.register.confirm.store.map.cancel', ['token' => $tempUser->token]) }}';
+                            '{{ route('guest.register.confirm.store.map.cancel', ['token' => $tempUser->token]) }}';
 
                         // CSRFトークンを追加
                         const csrfToken = document.createElement('input');

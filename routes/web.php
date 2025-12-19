@@ -17,7 +17,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // Japan Post API proxy
 Route::get('/api/japan-post/search', [App\Http\Controllers\Api\JapanPostController::class, 'searchAddress'])->name('api.japan-post.search');
 
-Route::prefix('user')->name('user.')->middleware('guest')->group(function () {
+Route::prefix('guest')->name('guest.')->middleware('guest')->group(function () {
     Route::get('login', [UserAuthenticationController::class, 'create'])->name('login');
     Route::post('login', [UserAuthenticationController::class, 'store'])->name('login.store');
 
@@ -41,6 +41,9 @@ Route::prefix('user')->name('user.')->middleware('guest')->group(function () {
     Route::prefix('payment')->name('payment.')->group(function () {
         Route::get('token/{token}', [UserTempUserPaymentController::class, 'index'])->name('index');
         Route::post('token/{token}', [UserTempUserPaymentController::class, 'store'])->name('store');
+        Route::get('callback/token/{token}', [UserTempUserPaymentController::class, 'callback'])->name('callback');
+        Route::get('cancel/token/{token}', [UserTempUserPaymentController::class, 'cancel'])->name('cancel');
+        Route::get('complete/token/{token}', [UserTempUserPaymentController::class, 'complete'])->name('complete');
     });
 });
 

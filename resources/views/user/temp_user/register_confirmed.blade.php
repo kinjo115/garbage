@@ -13,7 +13,7 @@
     <meta property="og:title" content="新規申込みの登録 | 名古屋市ゴミ収集サイト">
     <meta property="og:description" content="新規申込みの登録 | 名古屋市ゴミ収集サイト">
     <meta property="og:image" content="{{ asset('assets/images/ogp.png') }}">
-    <meta property="og:url" content="{{ route('user.register.confirm', ['token' => $tempUser->token]) }}">
+    <meta property="og:url" content="{{ route('guest.register.confirm', ['token' => $tempUser->token]) }}">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ja_JP">
     <meta property="og:site_name" content="名古屋市ゴミ収集サイト">
@@ -49,7 +49,7 @@
                     <p>・お申し込みの途中に前の画面に戻る場合は、必ず各画面の「戻る」ボタンをクリックしてください。</p>
                     <p>※ブラウザの「戻る」機能は使用しないでください。</p>
                 </div>
-                <form action="{{ route('user.register.confirm.store', ['token' => $tempUser->token]) }}" method="POST"
+                <form action="{{ route('guest.register.confirm.store', ['token' => $tempUser->token]) }}" method="POST"
                     class="mt-16">
                     @csrf
                     <div class="grid md:grid-cols-2 grid-cols-1 gap-2">
@@ -211,7 +211,7 @@
                     </div>
                     <div class="form-group">
                         <div class="flex items-center gap-10">
-                            <label for="town" class="form-label required">マンション名</label>
+                            <label for="town" class="form-label">マンション名</label>
                         </div>
                         <div class="form-input-wrapper">
                             <div class="flex items-end gap-2">
@@ -296,7 +296,7 @@
                         <button type="submit" class="c-button btn-416FED">地図の登録に進む</button>
                     </div>
                     <div class="md:mt-16 mt-10 flex justify-center">
-                        <a href="{{ route('user.register') }}" class="c-btn-black">戻る</a>
+                        <a href="{{ route('guest.register') }}" class="c-btn-black">戻る</a>
                     </div>
                 </form>
             </div>

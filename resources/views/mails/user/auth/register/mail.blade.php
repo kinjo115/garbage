@@ -32,7 +32,7 @@
             </p>
 
             @if (isset($mailInfo['token']))
-                <a href="{{ route('user.register.confirm', ['token' => $mailInfo['token']]) }}"
+                <a href="{{ route('guest.register.confirm', ['token' => $mailInfo['token']]) }}"
                     style="display: inline-block; background-color: #ED4141; color: #fff; padding: 12px 30px; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 16px; text-align: center;">
                     登録手続きを完了する
                 </a>
@@ -52,7 +52,7 @@
                 <strong>リンクがクリックできない場合:</strong><br>
                 以下のURLをブラウザのアドレスバーにコピー＆ペーストしてください。<br>
                 <span style="font-family: monospace; font-size: 12px; word-break: break-all; color: #ED4141;">
-                    {{ route('user.register.confirm', ['token' => $mailInfo['token'] ?? '']) }}
+                    {{ route('guest.register.confirm', ['token' => $mailInfo['token'] ?? '']) }}
                 </span>
             </p>
         </div>

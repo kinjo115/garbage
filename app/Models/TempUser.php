@@ -25,4 +25,9 @@ class TempUser extends Model
     {
         return $this->hasOne(UserInfo::class);
     }
+
+    public function selectedItem()
+    {
+        return $this->hasOne(SelectedItem::class)->whereNull('user_id');
+    }
 }

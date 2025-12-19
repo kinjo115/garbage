@@ -8,7 +8,7 @@
     <meta property="og:title" content="新規申込みの受付 | 名古屋市ゴミ収集サイト">
     <meta property="og:description" content="新規申込みの受付 | 名古屋市ゴミ収集サイト">
     <meta property="og:image" content="{{ asset('assets/images/ogp.png') }}">
-    <meta property="og:url" content="{{ route('user.register') }}">
+    <meta property="og:url" content="{{ route('guest.register') }}">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ja_JP">
     <meta property="og:site_name" content="名古屋市ゴミ収集サイト">
@@ -37,7 +37,7 @@
                     <p>ドメイン等で受信拒否設定されている場合は解除してください。</p>
                     <p>メールの設定については、お使いのプロバイダなどのメールアドレス提供事業者にお問い合わせください。</p>
                 </div>
-                <form action="{{ route('user.register.store') }}" method="POST" class="mt-16">
+                <form action="{{ route('guest.register.store') }}" method="POST" class="mt-16">
                     @csrf
                     <div class="form-group">
                         <div class="flex items-center gap-10">
@@ -72,7 +72,7 @@
                     </div>
                 </form>
                 <div class="text-center mt-10">
-                    既にアカウントをお持ちの方は<a href="{{ route('user.login') }}" class="text-ED4141 text-underline">こちら</a>
+                    既にアカウントをお持ちの方は<a href="{{ route('guest.login') }}" class="text-ED4141 text-underline">こちら</a>
                 </div>
             </div>
         </div>

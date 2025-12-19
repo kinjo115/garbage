@@ -8,7 +8,7 @@
     <meta property="og:title" content="新規登録 | 名古屋市ゴミ収集サイト">
     <meta property="og:description" content="新規登録 | 名古屋市ゴミ収集サイト">
     <meta property="og:image" content="{{ asset('assets/images/ogp.png') }}">
-    <meta property="og:url" content="{{ route('user.register') }}">
+    <meta property="og:url" content="{{ route('guest.register') }}">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ja_JP">
     <meta property="og:site_name" content="名古屋市ゴミ収集サイト">

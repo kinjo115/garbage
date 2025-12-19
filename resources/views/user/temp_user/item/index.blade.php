@@ -8,7 +8,7 @@
     <meta property="og:title" content="品目選択 | 名古屋市ゴミ収集サイト">
     <meta property="og:description" content="品目選択 | 名古屋市ゴミ収集サイト">
     <meta property="og:image" content="{{ asset('assets/images/ogp.png') }}">
-    <meta property="og:url" content="{{ route('user.register.confirm.store.map', ['token' => $tempUser->token]) }}">
+    <meta property="og:url" content="{{ route('guest.register.confirm.store.map', ['token' => $tempUser->token]) }}">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ja_JP">
     <meta property="og:site_name" content="名古屋市ゴミ収集サイト">
@@ -26,7 +26,7 @@
                 </div>
             </div>
 
-            <form id="items-form" method="POST" action="{{ route('user.item.store', ['token' => $tempUser->token]) }}"
+            <form id="items-form" method="POST" action="{{ route('guest.item.store', ['token' => $tempUser->token]) }}"
                 data-initial-items='@json($initialSelectedItems ?? [])'>
                 @csrf
                 <input type="hidden" name="items_json" id="items-json">
@@ -93,7 +93,7 @@
                         <button type="submit" class="c-button btn-416FED">申込内容の確認に進む</button>
                     </div>
                     <div class="md:mt-16 mt-10 flex justify-center">
-                        <a href="{{ route('user.register.confirm.store.map', ['token' => $tempUser->token]) }}"
+                        <a href="{{ route('guest.register.confirm.store.map', ['token' => $tempUser->token]) }}"
                             class="c-btn-black">戻る</a>
                     </div>
                 </div>

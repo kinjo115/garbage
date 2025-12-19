@@ -19,7 +19,7 @@ class TempUserItemController extends Controller
 
         if ($tempUser->status < 2) {
             return redirect()
-                ->route('user.register.confirm.store.map', ['token' => $token])
+                ->route('guest.register.confirm.store.map', ['token' => $token])
                 ->with('error', '申込みが完了していません。基本情報を入力してください。');
         }
 
@@ -118,7 +118,7 @@ class TempUserItemController extends Controller
         );
 
         return redirect()
-            ->route('user.confirmation.index', ['token' => $token])
+            ->route('guest.confirmation.index', ['token' => $token])
             ->with('success', '品目を保存しました。');
     }
 
@@ -132,7 +132,7 @@ class TempUserItemController extends Controller
 
         if (!$selected) {
             return redirect()
-                ->route('user.item.index', ['token' => $token])
+                ->route('guest.item.index', ['token' => $token])
                 ->with('error', '品目が選択されていません。');
         }
 
@@ -205,7 +205,7 @@ class TempUserItemController extends Controller
 
         if (!$selected) {
             return redirect()
-                ->route('user.item.index', ['token' => $token])
+                ->route('guest.item.index', ['token' => $token])
                 ->with('error', '品目が選択されていません。');
         }
 
@@ -214,7 +214,7 @@ class TempUserItemController extends Controller
         $selected->save();
 
         return redirect()
-            ->route('user.payment.index', ['token' => $token])
+            ->route('guest.payment.index', ['token' => $token])
             ->with('success', '申込内容を確認しました。支払い方法を選択してください。');
     }
 

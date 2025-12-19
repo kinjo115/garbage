@@ -8,7 +8,7 @@
     <meta property="og:title" content="申込内容の確認 | 名古屋市ゴミ収集サイト">
     <meta property="og:description" content="申込内容の確認 | 名古屋市ゴミ収集サイト">
     <meta property="og:image" content="{{ asset('assets/images/ogp.png') }}">
-    <meta property="og:url" content="{{ route('user.register.confirm.store.map', ['token' => $tempUser->token]) }}">
+    <meta property="og:url" content="{{ route('guest.register.confirm.store.map', ['token' => $tempUser->token]) }}">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ja_JP">
     <meta property="og:site_name" content="名古屋市ゴミ収集サイト">
@@ -29,7 +29,7 @@
                 <div class="page-header">
                     <h1 class="page-title">申込内容の確認</h1>
                 </div>
-                <form action="{{ route('user.confirmation.store', ['token' => $tempUser->token]) }}" method="POST"
+                <form action="{{ route('guest.confirmation.store', ['token' => $tempUser->token]) }}" method="POST"
                     id="confirmation-form">
                     @csrf
                     <div class="form-notification">まだ申込みは完了していません</div>
@@ -171,9 +171,9 @@
                     {{-- ナビゲーションボタン --}}
                     <div class="navigation-buttons mt-16">
                         <div class="flex flex-wrap gap-4 justify-center">
-                            <a href="{{ route('user.register.confirm.store.map', ['token' => $tempUser->token]) }}"
+                            <a href="{{ route('guest.register.confirm.store.map', ['token' => $tempUser->token]) }}"
                                 class="c-btn-black">基本情報に戻る</a>
-                            <a href="{{ route('user.item.index', ['token' => $tempUser->token]) }}"
+                            <a href="{{ route('guest.item.index', ['token' => $tempUser->token]) }}"
                                 class="c-btn-black">品目選択に戻る</a>
                             <button type="button" class="c-btn-black" id="cancel-application-btn">申込みを中止する</button>
                         </div>

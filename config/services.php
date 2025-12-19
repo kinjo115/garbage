@@ -47,4 +47,20 @@ return [
         'api_key' => env('GOOGLE_MAPS_API_KEY'),
     ],
 
+    // GMOペイメント設定
+    'gmo_payment' => (function () {
+        $apiUrl = env('GMO_PAYMENT_API_URL', 'https://kt01.mul-pay.jp/payment');
+        return [
+            'site_id' => env('GMO_PAYMENT_SITE_ID'),
+            'site_pass' => env('GMO_PAYMENT_SITE_PASS'),
+            'shop_id' => env('GMO_PAYMENT_SHOP_ID'),
+            'shop_pass' => env('GMO_PAYMENT_SHOP_PASS'),
+            'api_url' => $apiUrl,
+            'entry_url' => env('GMO_PAYMENT_ENTRY_URL', rtrim($apiUrl, '/') . '/EntryTran.idPass'),
+            'exec_url' => env('GMO_PAYMENT_EXEC_URL', rtrim($apiUrl, '/') . '/ExecTran.idPass'),
+            'return_url' => env('GMO_PAYMENT_RETURN_URL', '/user/payment/callback'),
+            'cancel_url' => env('GMO_PAYMENT_CANCEL_URL', '/user/payment/cancel'),
+        ];
+    })(),
+
 ];

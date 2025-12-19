@@ -211,7 +211,7 @@
 
             {{-- 最終確認セクション --}}
             <div class="confirmation-section">
-                <form id="agreement-form" method="GET" action="{{ route('user.register') }}">
+                <form id="agreement-form" method="GET" action="{{ route('guest.register') }}">
                     <div class="confirmation-text text-center">
                         <p>上記内容について確認しました。</p>
                         <p>申し込む粗大ごみは、家庭から出るものです。</p>
@@ -241,7 +241,7 @@
                     <p class="text-center">はじめて申込む場合</p>
 
                     <div class="mt-5">
-                        <a href="{{ route('user.register') }}" class="c-button btn-416FED">新規登録</a>
+                        <a href="{{ route('guest.register') }}" class="c-button btn-416FED">新規登録</a>
                     </div>
                 </div>
                 <div class="mt-10">
@@ -255,7 +255,7 @@
                         <p>・受付の取消は、収集日の１日前までに行ってください。</p>
                     </div>
                     <div class="mt-5">
-                        <a href="{{ route('user.login') }}" class="c-button btn-ED4141">ログイン</a>
+                        <a href="{{ route('guest.login') }}" class="c-button btn-ED4141">ログイン</a>
                     </div>
                 </div>
             </div>

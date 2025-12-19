@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('selected_items', function (Blueprint $table) {
+            $table->date('collection_date')->nullable()->after('transaction_id');
             $table->tinyInteger('confirm_status')->default(0)->comment('0: not confirmed, 1: confirmed')->after('collection_date');
         });
     }
@@ -22,8 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('selected_items', function (Blueprint $table) {
-            $table->dropColumn('confirm_status');
+            $table->dropColumn(['collection_date', 'confirm_status']);
         });
     }
 };
-

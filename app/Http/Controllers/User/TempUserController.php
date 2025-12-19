@@ -32,7 +32,7 @@ class TempUserController extends Controller
             ->first();
 
         if (!$tempUser) {
-            return redirect()->route('user.register')
+            return redirect()->route('guest.register')
                 ->with('error', '無効なトークンまたは期限切れです。');
         }
 
@@ -86,7 +86,7 @@ class TempUserController extends Controller
 
             DB::commit();
 
-            return redirect()->route('user.register.confirm.store.map', ['token' => $token])
+            return redirect()->route('guest.register.confirm.store.map', ['token' => $token])
                 ->with('success', '登録が完了しました。');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -112,7 +112,7 @@ class TempUserController extends Controller
         }
 
         if (!$tempUser->userInfo) {
-            return redirect()->route('user.register.confirm', ['token' => $token])
+            return redirect()->route('guest.register.confirm', ['token' => $token])
                 ->with('error', '新規申込みの登録が完了していません。最初からやり直してください。');
         }
 
@@ -151,7 +151,7 @@ class TempUserController extends Controller
         $tempUser = TempUser::where('token', $token)->first();
 
         if (!$tempUser) {
-            return redirect()->route('user.register')
+            return redirect()->route('guest.register')
                 ->with('error', '無効なトークンです。');
         }
 
@@ -170,7 +170,7 @@ class TempUserController extends Controller
             $userInfo = UserInfo::where('temp_user_id', $tempUser->id)->first();
 
             if (!$userInfo) {
-                return redirect()->route('user.register.confirm', ['token' => $token])
+                return redirect()->route('guest.register.confirm', ['token' => $token])
                     ->with('error', 'ユーザー情報が見つかりません。最初からやり直してください。');
             }
 
@@ -222,7 +222,7 @@ class TempUserController extends Controller
 
             DB::commit();
 
-            return redirect()->route('user.item.index', ['token' => $token])
+            return redirect()->route('guest.item.index', ['token' => $token])
                 ->with('success', '地図登録が完了しました。品目入力画面は準備中です。');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -246,7 +246,7 @@ class TempUserController extends Controller
         $tempUser = TempUser::where('token', $token)->first();
 
         if (!$tempUser) {
-            return redirect()->route('user.register')
+            return redirect()->route('guest.register')
                 ->with('error', '無効なトークンです。');
         }
 
