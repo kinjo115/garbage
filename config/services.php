@@ -57,7 +57,7 @@ return [
             'shop_pass' => env('GMO_PAYMENT_SHOP_PASS'),
             'config_id' => env('GMO_PAYMENT_CONFIG_ID', '001'),
             'api_url' => $apiUrl,
-            'get_linkplus_url' =>$apiUrl . '/GetLinkplusUrl',
+            'get_linkplus_url' => env('GMO_PAYMENT_GET_LINKPLUS_URL', rtrim($apiUrl, '/') . '/GetLinkplusUrl.json'),
             'entry_url' => $apiUrl . '/EntryTran',
             'exec_url' => $apiUrl . '/ExecTran',
             'return_url' => env('GMO_PAYMENT_RETURN_URL', '/user/payment/callback'),

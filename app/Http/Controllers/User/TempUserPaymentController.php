@@ -125,34 +125,68 @@ class TempUserPaymentController extends Controller
         $selected->save();
 
         try {
+            // ユーザー情報を取得（メール送信・顧客名用）
+            $userInfo = UserInfo::where('temp_user_id', $tempUser->id)->first();
+            $customerName = '';
+            if ($userInfo) {
+                $customerName = trim(($userInfo->last_name ?? '') . ' ' . ($userInfo->first_name ?? ''));
+            }
+
             // GetLinkplusUrl API リクエストパラメータの準備
-            $requestParams = [
+            // ドキュメントに基づく正しいJSON構造
+            $getUrlParam = [
                 'ShopID' => $config['shop_id'],
                 'ShopPass' => $config['shop_pass'],
-                'ConfigID' => $config['config_id'] ?? '001',
-                'OrderID' => $orderId,
-                'Amount' => $amount,
-                'Tax' => 0,
-                'RetURL' => route('guest.payment.callback', ['token' => $tempUser->token]),
-                'JobCd' => 'CAPTURE', // 即時決済
+                'GuideMailSendFlag' => '1',
+                'SendMailAddress' => $tempUser->email,
+            ];
+
+            // 顧客名がある場合は追加
+            if (!empty($customerName)) {
+                $getUrlParam['CustomerName'] = $customerName;
+            }
+
+            // TemplateNo（テンプレート番号）は必要に応じて追加可能
+            // $getUrlParam['TemplateNo'] = '1';
+
+            // 本人認証質問（必要に応じて追加可能）
+            // $getUrlParam['AuthenticationQuestion1'] = '質問';
+            // $getUrlParam['AuthenticationAnswer1'] = '答え';
+
+            // JSON構造に従ったリクエストボディ
+            $requestBody = [
+                'geturlparam' => $getUrlParam,
+                'configid' => $config['config_id'] ?? '001',
+                'transaction' => [
+                    'OrderID' => $orderId,
+                    'Amount' => (string)$amount,
+                    'Tax' => '0',
+                ],
+                'credit' => [
+                    'JobCd' => 'CAPTURE', // AUTH=仮売上, CAPTURE=即時決済
+                ],
             ];
 
             // デバッグ用ログ（パスワードはマスク）
+            $logData = $requestBody;
+            $logData['geturlparam']['ShopPass'] = '***'; // パスワードをマスク
             Log::info('GMO GetLinkplusUrl Request', [
-                'ShopID' => $config['shop_id'],
-                'ShopPass' => !empty($config['shop_pass']) ? '***' : 'EMPTY',
-                'ShopPass_length' => strlen($config['shop_pass'] ?? ''),
-                'ConfigID' => $requestParams['ConfigID'],
+                'configid' => $requestBody['configid'],
                 'OrderID' => $orderId,
                 'OrderID_length' => strlen($orderId),
                 'Amount' => $amount,
-                'Tax' => $requestParams['Tax'],
-                'RetURL' => $requestParams['RetURL'],
+                'Tax' => $requestBody['transaction']['Tax'],
+                'JobCd' => $requestBody['credit']['JobCd'],
                 'URL' => $config['get_linkplus_url'],
+                'request_body' => $logData,
             ]);
 
             /** GetLinkplusUrl API - 決済URL取得（単一ステップ） */
-            $response = Http::asForm()
+            // JSON形式でリクエストを送信
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])
                 ->timeout(30)
                 ->withOptions([
                     'curl' => [
@@ -160,7 +194,8 @@ class TempUserPaymentController extends Controller
                         CURLOPT_SSL_VERIFYHOST => 2,
                     ],
                 ])
-                ->post($config['get_linkplus_url'], $requestParams);
+                ->post($config['get_linkplus_url'], $requestBody);
+                // ->post($config['get_linkplus_url'], $requestParams);
 
             // 実際に送信されたリクエストの詳細をログに記録
             Log::info('GMO GetLinkplusUrl Response', [
@@ -171,24 +206,55 @@ class TempUserPaymentController extends Controller
 
             // HTTPステータスコードの確認
             if (!$response->successful()) {
+                // JSONレスポンスをパース（フォールバック: テキスト形式）
+                $errorResult = $response->json();
+                if (!$errorResult) {
+                    parse_str($response->body(), $errorResult);
+                }
+
+                $errCode = $errorResult['ErrCode'] ?? ($errorResult['errCode'] ?? 'UNKNOWN');
+                $errInfo = $errorResult['ErrInfo'] ?? ($errorResult['errInfo'] ?? '');
+
                 Log::error('GMO GetLinkplusUrl HTTP Error', [
                     'status_code' => $response->status(),
                     'body' => $response->body(),
+                    'ErrCode' => $errCode,
+                    'ErrInfo' => $errInfo,
                     'OrderID' => $orderId,
+                    'URL' => $config['get_linkplus_url'],
                 ]);
+
+                // E91エラーの場合、LinkPlusが有効でない可能性がある
+                // EntryTran/ExecTranフローにフォールバック
+                if ($errCode === 'E91' || $errCode === 'E91099997') {
+                    Log::info('GMO GetLinkplusUrl not available, falling back to EntryTran/ExecTran', [
+                        'ErrCode' => $errCode,
+                        'OrderID' => $orderId,
+                    ]);
+
+                    // EntryTran/ExecTranフローに切り替え
+                    return $this->redirectToGmoPaymentEntryExec($tempUser, $selected, $orderId, $amount, $config);
+                }
 
                 return redirect()
                     ->route('guest.payment.index', ['token' => $tempUser->token])
-                    ->with('error', '決済サーバーへの接続に失敗しました。');
+                    ->with('error', '決済サーバーへの接続に失敗しました。エラーコード: ' . $errCode);
             }
 
-            parse_str($response->body(), $result);
+            // JSONレスポンスをパース（フォールバック: テキスト形式）
+            $result = $response->json();
+            if (!$result) {
+                parse_str($response->body(), $result);
+            }
 
             // エラーチェック
-            if (isset($result['ErrCode']) && !empty($result['ErrCode'])) {
+            $errCode = $result['ErrCode'] ?? ($result['errCode'] ?? null);
+            if (!empty($errCode)) {
+                $errInfo = $result['ErrInfo'] ?? ($result['errInfo'] ?? null);
+
                 Log::error('GMO GetLinkplusUrl Error', [
-                    'ErrCode' => $result['ErrCode'] ?? null,
-                    'ErrInfo' => $result['ErrInfo'] ?? null,
+                    'ErrCode' => $errCode,
+                    'ErrInfo' => $errInfo,
                     'OrderID' => $orderId,
                     'Amount' => $amount,
                     'ShopID' => $config['shop_id'],
@@ -197,8 +263,8 @@ class TempUserPaymentController extends Controller
                 ]);
 
                 $errorMessage = '決済処理の開始に失敗しました。';
-                if (isset($result['ErrInfo'])) {
-                    $errorMessage .= ' エラー: ' . $result['ErrInfo'];
+                if ($errInfo) {
+                    $errorMessage .= ' エラー: ' . $errInfo;
                 }
 
                 return redirect()
@@ -206,7 +272,10 @@ class TempUserPaymentController extends Controller
                     ->with('error', $errorMessage);
             }
 
-            if (!isset($result['StartURL'])) {
+            // StartURLを取得（JSONまたはテキスト形式に対応）
+            $startUrl = $result['StartURL'] ?? ($result['startURL'] ?? ($result['starturl'] ?? null));
+
+            if (!$startUrl) {
                 Log::error('GMO GetLinkplusUrl Missing StartURL', [
                     'Response' => $response->body(),
                     'Parsed' => $result,
@@ -218,7 +287,7 @@ class TempUserPaymentController extends Controller
             }
 
             // GMO決済画面へリダイレクト
-            return redirect($result['StartURL']);
+            return redirect($startUrl);
         } catch (\Exception $e) {
             Log::error('GMO Payment Exception', [
                 'message' => $e->getMessage(),
@@ -546,5 +615,127 @@ class TempUserPaymentController extends Controller
         $user = User::find($selected->user_id);
 
         return view('user.temp_user.payment.complete', compact('tempUser', 'selected', 'user'));
+    }
+
+    /**
+     * EntryTran/ExecTranフロー（GetLinkplusUrlが利用できない場合のフォールバック）
+     */
+    private function redirectToGmoPaymentEntryExec($tempUser, $selected, $orderId, $amount, $config)
+    {
+        try {
+            // Step 1: EntryTran - 取引登録
+            $entryParams = [
+                'ShopID' => $config['shop_id'],
+                'ShopPass' => $config['shop_pass'],
+                'OrderID' => $orderId,
+                'Amount' => (string)$amount,
+                'Tax' => '0',
+            ];
+
+            Log::info('GMO EntryTran Request (Fallback)', [
+                'OrderID' => $orderId,
+                'Amount' => $amount,
+                'URL' => rtrim($config['api_url'], '/') . '/EntryTran.idPass',
+            ]);
+
+            $entryResponse = Http::asForm()
+                ->timeout(30)
+                ->withOptions([
+                    'curl' => [
+                        CURLOPT_SSL_VERIFYPEER => true,
+                        CURLOPT_SSL_VERIFYHOST => 2,
+                    ],
+                ])
+                ->post(rtrim($config['api_url'], '/') . '/EntryTran.idPass', $entryParams);
+
+            if (!$entryResponse->successful()) {
+                Log::error('GMO EntryTran HTTP Error', [
+                    'status_code' => $entryResponse->status(),
+                    'body' => $entryResponse->body(),
+                ]);
+                return redirect()
+                    ->route('guest.payment.index', ['token' => $tempUser->token])
+                    ->with('error', '決済サーバーへの接続に失敗しました。');
+            }
+
+            parse_str($entryResponse->body(), $entryResult);
+
+            if (isset($entryResult['ErrCode']) && !empty($entryResult['ErrCode'])) {
+                Log::error('GMO EntryTran Error', [
+                    'ErrCode' => $entryResult['ErrCode'],
+                    'ErrInfo' => $entryResult['ErrInfo'] ?? null,
+                ]);
+                return redirect()
+                    ->route('guest.payment.index', ['token' => $tempUser->token])
+                    ->with('error', '決済処理の開始に失敗しました。エラー: ' . ($entryResult['ErrInfo'] ?? $entryResult['ErrCode']));
+            }
+
+            if (!isset($entryResult['AccessID']) || !isset($entryResult['AccessPass'])) {
+                Log::error('GMO EntryTran Missing AccessID/AccessPass');
+                return redirect()
+                    ->route('guest.payment.index', ['token' => $tempUser->token])
+                    ->with('error', '決済処理の開始に失敗しました。');
+            }
+
+            // Step 2: ExecTran - 決済実行
+            $execParams = [
+                'SiteID' => $config['site_id'],
+                'SitePass' => $config['site_pass'],
+                'AccessID' => $entryResult['AccessID'],
+                'AccessPass' => $entryResult['AccessPass'],
+                'OrderID' => $orderId,
+                'Method' => '1', // 一括
+                'RetURL' => route('guest.payment.callback', ['token' => $tempUser->token]),
+                'CancelURL' => route('guest.payment.cancel', ['token' => $tempUser->token]),
+                'ClientField1' => $tempUser->token ?? '',
+                'ClientField2' => (string)$selected->id,
+            ];
+
+            Log::info('GMO ExecTran Request (Fallback)', [
+                'OrderID' => $orderId,
+                'AccessID' => $entryResult['AccessID'],
+                'URL' => rtrim($config['api_url'], '/') . '/ExecTran.idPass',
+            ]);
+
+            $execResponse = Http::asForm()
+                ->timeout(30)
+                ->withOptions([
+                    'curl' => [
+                        CURLOPT_SSL_VERIFYPEER => true,
+                        CURLOPT_SSL_VERIFYHOST => 2,
+                    ],
+                ])
+                ->post(rtrim($config['api_url'], '/') . '/ExecTran.idPass', $execParams);
+
+            parse_str($execResponse->body(), $execResult);
+
+            if (isset($execResult['ErrCode']) && !empty($execResult['ErrCode'])) {
+                Log::error('GMO ExecTran Error', [
+                    'ErrCode' => $execResult['ErrCode'],
+                    'ErrInfo' => $execResult['ErrInfo'] ?? null,
+                ]);
+                return redirect()
+                    ->route('guest.payment.index', ['token' => $tempUser->token])
+                    ->with('error', '決済処理の実行に失敗しました。エラー: ' . ($execResult['ErrInfo'] ?? $execResult['ErrCode']));
+            }
+
+            if (!isset($execResult['StartURL'])) {
+                Log::error('GMO ExecTran Missing StartURL');
+                return redirect()
+                    ->route('guest.payment.index', ['token' => $tempUser->token])
+                    ->with('error', '決済画面へのリダイレクトに失敗しました。');
+            }
+
+            // GMO決済画面へリダイレクト
+            return redirect($execResult['StartURL']);
+        } catch (\Exception $e) {
+            Log::error('GMO EntryTran/ExecTran Exception', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return redirect()
+                ->route('guest.payment.index', ['token' => $tempUser->token])
+                ->with('error', '決済処理中にエラーが発生しました。もう一度お試しください。');
+        }
     }
 }
