@@ -57,10 +57,9 @@ return [
             'shop_pass' => env('GMO_PAYMENT_SHOP_PASS'),
             'config_id' => env('GMO_PAYMENT_CONFIG_ID', '001'),
             'api_url' => $apiUrl,
-            'get_linkplus_url' => env('GMO_PAYMENT_GET_LINKPLUS_URL', rtrim($apiUrl, '/') . '/GetLinkplusUrl.idPass'),
-            // 旧API（後方互換性のため保持）
-            'entry_url' => env('GMO_PAYMENT_ENTRY_URL', rtrim($apiUrl, '/') . '/EntryTran.idPass'),
-            'exec_url' => env('GMO_PAYMENT_EXEC_URL', rtrim($apiUrl, '/') . '/ExecTran.idPass'),
+            'get_linkplus_url' =>$apiUrl . '/GetLinkplusUrl',
+            'entry_url' => $apiUrl . '/EntryTran',
+            'exec_url' => $apiUrl . '/ExecTran',
             'return_url' => env('GMO_PAYMENT_RETURN_URL', '/user/payment/callback'),
             'cancel_url' => env('GMO_PAYMENT_CANCEL_URL', '/user/payment/cancel'),
         ];
