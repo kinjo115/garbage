@@ -255,7 +255,7 @@
                         <p>・受付の取消は、収集日の１日前までに行ってください。</p>
                     </div>
                     <div class="mt-5">
-                        <a href="{{ route('guest.login') }}" class="c-button btn-ED4141">ログイン</a>
+                        <a href="{{ route('user.login') }}" class="c-button btn-ED4141">ログイン</a>
                     </div>
                 </div>
             </div>

@@ -18,9 +18,6 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/api/japan-post/search', [App\Http\Controllers\Api\JapanPostController::class, 'searchAddress'])->name('api.japan-post.search');
 
 Route::prefix('guest')->name('guest.')->middleware('guest')->group(function () {
-    Route::get('login', [UserAuthenticationController::class, 'create'])->name('login');
-    Route::post('login', [UserAuthenticationController::class, 'store'])->name('login.store');
-
     Route::get('register', [UserAuthenticationController::class, 'createRegister'])->name('register');
     Route::post('register', [UserAuthenticationController::class, 'storeRegister'])->name('register.store');
 
@@ -40,12 +37,28 @@ Route::prefix('guest')->name('guest.')->middleware('guest')->group(function () {
 
     Route::prefix('payment')->name('payment.')->group(function () {
         Route::get('token/{token}', [UserTempUserPaymentController::class, 'index'])->name('index');
-        Route::post('token/{token}', [UserTempUserPaymentController::class, 'store'])->name('store');
+        Route::post('token/{token}', [UserTempUserPaymentController::class, 'st ore'])->name('store');
         Route::get('convenience/token/{token}', [UserTempUserPaymentController::class, 'convenience'])->name('convenience');
         Route::match(['get', 'post'], 'callback/token/{token}', [UserTempUserPaymentController::class, 'callback'])->name('callback');
         Route::get('cancel/token/{token}', [UserTempUserPaymentController::class, 'cancel'])->name('cancel');
         Route::get('complete/token/{token}', [UserTempUserPaymentController::class, 'complete'])->name('complete');
     });
+});
+
+// Custom user login (not using Fortify) - accessible to guests
+Route::prefix('user')->name('user.')->middleware('guest')->group(function () {
+    Route::get('login', [UserAuthenticationController::class, 'create'])->name('login');
+    Route::post('login', [UserAuthenticationController::class, 'store'])->name('login.store');
+});
+
+// Admin routes using Fortify (only for admin users)
+Route::prefix('admin')->name('admin.')->middleware('guest')->group(function () {
+    // Fortify will handle these routes at /admin/login
+});
+
+// Authenticated user routes
+Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
+    // Add authenticated user routes here
 });
 
 // Route::view('dashboard', 'dashboard')

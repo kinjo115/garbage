@@ -26,6 +26,17 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Configure Fortify to only allow admin users to login
+        Fortify::authenticateUsing(function (Request $request) {
+            $user = \App\Models\User::where('email', $request->email)->first();
+
+            if ($user &&
+                \Illuminate\Support\Facades\Hash::check($request->password, $user->password) &&
+                $user->role === \App\Models\User::ROLE['ADMIN']) {
+                return $user;
+            }
+        });
+
         $this->configureActions();
         $this->configureViews();
         $this->configureRateLimiting();

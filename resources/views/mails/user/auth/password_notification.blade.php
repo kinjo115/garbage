@@ -33,7 +33,7 @@
         </div>
 
         <p style="margin-top: 30px; margin-bottom: 10px;">
-            <a href="{{ route('guest.login') }}"
+            <a href="{{ route('user.login') }}"
                 style="display: inline-block; background-color: #416FED; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">ログインページへ</a>
         </p>
 

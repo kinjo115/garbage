@@ -72,7 +72,7 @@
                     </div>
                 </form>
                 <div class="text-center mt-10">
-                    既にアカウントをお持ちの方は<a href="{{ route('guest.login') }}" class="text-ED4141 text-underline">こちら</a>
+                    既にアカウントをお持ちの方は<a href="{{ route('user.login') }}" class="text-ED4141 text-underline">こちら</a>
                 </div>
             </div>
         </div>

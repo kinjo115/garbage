@@ -25,11 +25,19 @@ class AuthenticationController extends Controller
             'password' => 'required',
         ]);
 
+        // Only allow regular users (not admins) to login via this route
+        $user = \App\Models\User::where('email', $request->email)->first();
+
+        if ($user && $user->role === \App\Models\User::ROLE['ADMIN']) {
+            // Admins should use /admin/login (Fortify)
+            return redirect()->route('admin.login')->with('error', '管理者は管理画面からログインしてください。');
+        }
+
         if (Auth::attempt($request->only('email', 'password'))) {
             return redirect()->route('home');
         }
 
-        return redirect()->route('guest.login')->with('error', __('auth.failed'));
+        return redirect()->route('user.login')->with('error', __('auth.failed'));
     }
 
     public function createRegister()
