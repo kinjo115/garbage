@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Jobs\SendMessageJob;
+use App\Models\User;
 use App\Models\TempUser;
 use Carbon\Carbon;
 
@@ -23,16 +24,28 @@ class AuthenticationController extends Controller
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
+            'phone' => 'required|string|max:11',
         ]);
 
         // Only allow regular users (not admins) to login via this route
-        $user = \App\Models\User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->first();
 
-        if ($user && $user->role === \App\Models\User::ROLE['ADMIN']) {
+        if (!$user) {
+            return redirect()->route('user.login')->with('error', __('auth.failed'));
+        }
+
+        if ($user->role === User::ROLE['ADMIN']) {
             // Admins should use /admin/login (Fortify)
             return redirect()->route('admin.login')->with('error', '管理者は管理画面からログインしてください。');
         }
 
+        // Check if user has UserInfo and phone_number matches
+        $userInfo = $user->userInfo;
+        if (!$userInfo || $userInfo->phone_number !== $request->phone) {
+            return redirect()->route('user.login')->with('error', '電話番号が正しくありません。');
+        }
+
+        // Authenticate with email and password
         if (Auth::attempt($request->only('email', 'password'))) {
             return redirect()->route('home');
         }
