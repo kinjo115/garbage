@@ -14,6 +14,9 @@ use App\Http\Controllers\User\TempUserPaymentController as UserTempUserPaymentCo
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\User\UserInfoController;
 use App\Http\Controllers\User\HistoryController as UserHistoryController;
+use App\Http\Controllers\User\UserPasswordController;
+use App\Http\Controllers\User\WithdrawController as UserWithdrawController;
+
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -78,6 +81,19 @@ Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
         Route::get('index', [UserHistoryController::class, 'index'])->name('index');
         Route::get('show/{id}', [UserHistoryController::class, 'show'])->name('show');
         Route::post('cancel', [UserHistoryController::class, 'cancel'])->name('cancel');
+        Route::post('update-items/{id}', [UserHistoryController::class, 'updateItems'])->name('update-items');
+        Route::get('confirmation/{id}', [UserHistoryController::class, 'confirmation'])->name('confirmation');
+        Route::post('confirmation/{id}', [UserHistoryController::class, 'confirmationStore'])->name('confirmation.store');
+    });
+
+    Route::prefix('password')->name('password.')->group(function () {
+        Route::get('edit', [UserPasswordController::class, 'edit'])->name('edit');
+        Route::post('edit', [UserPasswordController::class, 'update'])->name('update');
+    });
+
+    Route::prefix('withdraw')->name('withdraw.')->group(function () {
+        Route::get('edit', [UserWithdrawController::class, 'edit'])->name('edit');
+        Route::post('edit', [UserWithdrawController::class, 'update'])->name('update');
     });
 
 });

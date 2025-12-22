@@ -58,133 +58,72 @@
                 @endif
 
                 <div class="confirm-main-info mt-16">
-                    <div class="confirm-main-info-title">
-                        <h2 class="text-4xl font-bold text-center">基本情報</h2>
-                    </div>
-                    <div class="mt-10 grid grid-cols-1 gap-2 w-full max-w-xl mx-auto">
-                        @if($receptionNumber)
-                            <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
-                                <div class="label w-full max-w-[120px] text-right">受付番号</div>
-                                <div class="w-full flex-1">
-                                    <input type="text" readonly class="form-input" value="{{ $receptionNumber }}">
-                                </div>
-                            </div>
-                        @endif
-                        <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
-                            <div class="label w-full max-w-[120px] text-right">名前</div>
-                            <div class="w-full flex-1">
-                                <input type="text" readonly class="form-input"
-                                    value="{{ $userInfo->last_name }} {{ $userInfo->first_name }}">
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
-                            <div class="label w-full max-w-[120px] text-right">郵便番号</div>
-                            <div class="w-full flex-1">
-                                <input type="text" readonly class="form-input"
-                                    value="{{ $userInfo->postal_code ? substr($userInfo->postal_code, 0, 3) . '-' . substr($userInfo->postal_code, 3) : '-' }}">
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
-                            <div class="label w-full max-w-[120px] text-right">住所</div>
-                            <div class="w-full flex-1">
-                                <input type="text" readonly class="form-input"
-                                    value="{{ ($userInfo->prefecture->name ?? '') }} {{ $userInfo->city ?? '' }} {{ $userInfo->town ?? '' }} {{ $userInfo->chome ?? '' }} {{ $userInfo->building_number ?? '' }} {{ $userInfo->house_number ?? '' }} {{ $userInfo->apartment_name ?? '' }} {{ $userInfo->apartment_number ?? '' }}">
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
-                            <div class="label w-full max-w-[120px] text-right">電話番号</div>
-                            <div class="w-full flex-1">
-                                <input type="text" readonly class="form-input"
-                                    value="{{ $userInfo->phone_number ?? '-' }}">
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
-                            <div class="label w-full max-w-[120px] text-right">緊急連絡先</div>
-                            <div class="w-full flex-1">
-                                <input type="text" readonly class="form-input"
-                                    value="{{ $userInfo->emergency_contact ?? '-' }}">
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
-                            <div class="label w-full max-w-[120px] text-right">メールアドレス</div>
-                            <div class="w-full flex-1">
-                                <input type="text" readonly class="form-input"
-                                    value="{{ $userInfo->user->email ?? '-' }}">
-                            </div>
-                        </div>
-                        @if($paymentMethodName !== '未決済')
-                            <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
-                                <div class="label w-full max-w-[120px] text-right">支払い方法</div>
-                                <div class="w-full flex-1">
-                                    <input type="text" readonly class="form-input" value="{{ $paymentMethodName }}">
-                                </div>
-                            </div>
-                        @endif
-                        @if($selectedItem->payment_date)
-                            <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
-                                <div class="label w-full max-w-[120px] text-right">決済日</div>
-                                <div class="w-full flex-1">
-                                    <input type="text" readonly class="form-input"
-                                        value="{{ \Carbon\Carbon::parse($selectedItem->payment_date)->format('Y年n月j日 H:i') }}">
-                                </div>
-                            </div>
-                        @endif
-                    </div>
 
-                    @if($userInfo->home_latitude && $userInfo->home_longitude)
-                        <div class="mt-10">
-                            <p class="text-center">ごみの排出位置は下の地図で確認してください。</p>
-                            <p class="text-center">※排出位置が誤っていないかご確認ください。</p>
-                        </div>
-
-                        {{-- map confirmation --}}
-                        <div class="form-group mt-10">
-                            <div id="map"
-                                style="width: 100%; height: 600px; border: 1px solid #ccc; border-radius: 5px;">
-                            </div>
-                        </div>
-
-                        <!-- 位置情報の隠しフィールド -->
-                        <input type="hidden" name="home_latitude" id="home_latitude"
-                            value="{{ $userInfo->home_latitude ?? '' }}">
-                        <input type="hidden" name="home_longitude" id="home_longitude"
-                            value="{{ $userInfo->home_longitude ?? '' }}">
-                        <input type="hidden" name="disposal_latitude" id="disposal_latitude"
-                            value="{{ $userInfo->disposal_latitude ?? '' }}">
-                        <input type="hidden" name="disposal_longitude" id="disposal_longitude"
-                            value="{{ $userInfo->disposal_longitude ?? '' }}">
-
-                        <!-- 住所情報（地図の初期表示用） -->
-                        <input type="hidden" id="user_address"
-                            value="{{ ($userInfo->prefecture->name ?? '') }} {{ $userInfo->city ?? '' }} {{ $userInfo->town ?? '' }}">
-                        <input type="hidden" id="user_postal_code"
-                            value="{{ $userInfo->postal_code ?? '' }}">
-                    @endif
 
                     <div class="mt-16">
-                        <div class="selected-items mt-16" data-initial-items='@json($initialSelectedItems ?? [])'>
-                            <div class="selected-items-header">
-                                <h2 class="selected-items-title">選択済み品目</h2>
-                            </div>
-                            <div class="selected-items-body">
-                                <div class="selected-items-wrapper" id="selected-items-wrapper">
-                                    {{-- JSで動的に挿入 --}}
+                        <form id="items-form" method="POST" action="{{ route('user.history.update-items', ['id' => $selectedItem->id]) }}"
+                            data-initial-items='@json($initialSelectedItems ?? [])'>
+                            @csrf
+                            <input type="hidden" name="items_json" id="items-json">
+
+                            <div class="selected-items mt-16">
+                                <div class="selected-items-header">
+                                    <h2 class="selected-items-title">選択済み品目</h2>
                                 </div>
-                                <div class="total-content mt-6">
-                                    <div class="total-content-title">合計金額</div>
-                                    <div class="total-content-amount" id="total-content-amount">0円 <span
-                                            class="text-sm">(0個)</span>
+                                <div class="selected-items-body">
+                                    <div class="selected-items-wrapper" id="selected-items-wrapper">
+                                        {{-- JSで動的に挿入 --}}
+                                    </div>
+                                    <div class="total-content mt-6">
+                                        <div class="total-content-title">合計金額</div>
+                                        <div class="total-content-amount" id="total-content-amount">0円 <span
+                                                class="text-sm">(0個)</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
 
-                {{-- ナビゲーションボタン --}}
-                <div class="navigation-buttons mt-16">
-                    <div class="flex flex-wrap gap-4 justify-center">
-                        <a href="{{ route('user.history.index') }}" class="c-btn-black">申込み履歴に戻る</a>
+                            @if($selectedItem->confirm_status !== \App\Models\SelectedItem::CONFIRM_STATUS_CANCELLED)
+                                {{-- 品目一覧 --}}
+                                <div class="mt-16">
+                                    <div class="form-description">
+                                        <p class="text-E20000 text-bold">【注意事項】</p>
+                                        <br>
+                                        <p>・品目名をクリックすると、一覧に追加されます。</p>
+                                        <p>・追加された品目に対して個数を設定し、品目全体を削除できます。</p>
+                                        <p>・複数の品目を追加した場合、合計金額が表示されます。</p>
+                                    </div>
+
+                                    <div class="item-list-wrapper mt-10" id="item-list-wrapper">
+                                        @foreach ($items as $item)
+                                            <div class="item-list-item" data-item-id="{{ $item->id }}"
+                                                data-item-name="{{ $item->name }}" data-item-price="{{ $item->price }}">
+                                                <div class="flex items-end justify-between">
+                                                    <button type="button" class="item-list-item-name js-add-item">
+                                                        {{ $item->name }}
+                                                    </button>
+                                                    <div class="item-list-item-price">{{ $item->price }}円</div>
+                                                </div>
+                                                <div class="category-wrapper">
+                                                    <div class="category-item">{{ $item->itemCategory->name ?? '' }}</div>
+                                                </div>
+                                                <div class="description-wrapper">
+                                                    <div class="label">説明表示</div>
+                                                    <div class="description-item">{{ $item->description }}</div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <div class="form-submit mt-10">
+                                    <button type="submit" class="c-button btn-416FED" id="update-items-btn" disabled>品目を更新する</button>
+                                </div>
+                                <div class="md:mt-16 mt-10 flex justify-center">
+                                    <a href="{{ route('user.history.index') }}" class="c-btn-black">戻る</a>
+                                </div>
+                            @endif
+                        </form>
                     </div>
                 </div>
             </div>
@@ -193,13 +132,14 @@
 
     <script>
         $(document).ready(function() {
-            // 確認ページ用：選択済み品目を表示（読み取り専用）
-            const $selectedItemsSection = $('.selected-items[data-initial-items]');
-            if ($selectedItemsSection.length) {
+            // 品目選択機能（TempUserのitem/indexと同じロジック）
+            const $itemsForm = $('#items-form');
+            if ($itemsForm.length) {
                 let selectedItems = [];
+                let initialSelectedItems = []; // 初期状態を保存
 
                 // 初期選択データを読み込む
-                const initialItemsAttr = $selectedItemsSection.attr('data-initial-items');
+                const initialItemsAttr = $itemsForm.attr('data-initial-items');
                 if (initialItemsAttr) {
                     try {
                         const parsed = JSON.parse(initialItemsAttr);
@@ -212,6 +152,8 @@
                                     quantity: item.quantity,
                                 };
                             });
+                            // 初期状態をディープコピーで保存
+                            initialSelectedItems = JSON.parse(JSON.stringify(selectedItems));
                         }
                     } catch (e) {
                         console.warn('初期品目データのパースに失敗しました', e);
@@ -220,8 +162,56 @@
 
                 const $selectedWrapper = $('#selected-items-wrapper');
                 const $totalAmount = $('#total-content-amount');
+                const $updateBtn = $('#update-items-btn');
 
-                // 選択済み一覧を描画（読み取り専用、編集機能なし）
+                /**
+                 * 品目が変更されたかどうかをチェック
+                 */
+                function checkItemsChanged() {
+                    if (selectedItems.length !== initialSelectedItems.length) {
+                        return true;
+                    }
+
+                    // 各品目を比較
+                    const currentMap = {};
+                    selectedItems.forEach(function(item) {
+                        currentMap[item.id] = item.quantity;
+                    });
+
+                    const initialMap = {};
+                    initialSelectedItems.forEach(function(item) {
+                        initialMap[item.id] = item.quantity;
+                    });
+
+                    // 品目IDのセットを比較
+                    const currentIds = Object.keys(currentMap).sort();
+                    const initialIds = Object.keys(initialMap).sort();
+
+                    if (currentIds.join(',') !== initialIds.join(',')) {
+                        return true;
+                    }
+
+                    // 各品目の数量を比較
+                    for (let id in currentMap) {
+                        if (currentMap[id] !== initialMap[id]) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+
+                /**
+                 * 更新ボタンの状態を更新
+                 */
+                function updateSubmitButton() {
+                    const hasChanges = checkItemsChanged();
+                    $updateBtn.prop('disabled', !hasChanges);
+                }
+
+                /**
+                 * 選択済み一覧を再描画
+                 */
                 function renderSelectedItems() {
                     $selectedWrapper.empty();
 
@@ -241,7 +231,19 @@
                                 </div>
                                 <div class="flex">
                                     <div class="quantity-wrapper mt-10">
+                                        <button type="button" class="decrease-button">
+                                            <img src="${window.assetUrls?.iconMinus || '/assets/images/icons/icon-minus.svg'}" alt="マイナス">
+                                        </button>
+                                        <input type="number" value="${item.quantity}" class="quantity-input" hidden>
                                         <div class="count">${item.quantity}</div>
+                                        <button type="button" class="increase-button">
+                                            <img src="${window.assetUrls?.iconPlus || '/assets/images/icons/icon-plus.svg'}" alt="プラス">
+                                        </button>
+                                    </div>
+                                    <div class="delete-button">
+                                        <button type="button" class="delete-button-icon">
+                                            <img src="${window.assetUrls?.trash || '/assets/images/icons/trash.svg'}" alt="削除">
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -250,14 +252,158 @@
                         $selectedWrapper.append($itemEl);
                     });
 
-                    $totalAmount.html(
-                        `${totalPrice.toLocaleString()}円 <span class="text-sm">(${totalCount}個)</span>`);
+                    $totalAmount.html(`${totalPrice.toLocaleString()}円 <span class="text-sm">(${totalCount}個)</span>`);
+
+                    // ボタンの状態を更新
+                    updateSubmitButton();
                 }
+
+                /**
+                 * 品目カードクリックで選択リストに追加
+                 */
+                $(document).on('click', '.item-list-item', function(e) {
+                    if ($(e.target).closest('.no-add').length) {
+                        return;
+                    }
+
+                    const $parent = $(this);
+                    const id = parseInt($parent.data('item-id'), 10);
+                    const name = $parent.data('item-name');
+                    const price = parseInt($parent.data('item-price'), 10);
+
+                    if (!id || !name || isNaN(price)) {
+                        console.warn('品目情報が不正です', { id, name, price });
+                        return;
+                    }
+
+                    const existing = selectedItems.find(function(i) {
+                        return i.id === id;
+                    });
+
+                    if (existing) {
+                        existing.quantity += 1;
+                    } else {
+                        selectedItems.push({
+                            id: id,
+                            name: name,
+                            price: price,
+                            quantity: 1,
+                        });
+                    }
+
+                    renderSelectedItems();
+                });
+
+                /**
+                 * 数量変更（+ / -）
+                 */
+                $selectedWrapper.on('click', '.increase-button', function() {
+                    const $itemEl = $(this).closest('.selected-item');
+                    const id = parseInt($itemEl.data('item-id'), 10);
+
+                    const target = selectedItems.find(function(i) {
+                        return i.id === id;
+                    });
+                    if (!target) return;
+
+                    target.quantity += 1;
+                    renderSelectedItems();
+                });
+
+                $selectedWrapper.on('click', '.decrease-button', function() {
+                    const $itemEl = $(this).closest('.selected-item');
+                    const id = parseInt($itemEl.data('item-id'), 10);
+
+                    const target = selectedItems.find(function(i) {
+                        return i.id === id;
+                    });
+                    if (!target) return;
+
+                    if (target.quantity > 1) {
+                        target.quantity -= 1;
+                    } else {
+                        return;
+                    }
+                    renderSelectedItems();
+                });
+
+                /**
+                 * 品目削除
+                 */
+                $selectedWrapper.on('click', '.delete-button-icon', function() {
+                    const $itemEl = $(this).closest('.selected-item');
+                    const id = parseInt($itemEl.data('item-id'), 10);
+
+                    selectedItems = selectedItems.filter(function(i) {
+                        return i.id !== id;
+                    });
+
+                    renderSelectedItems();
+                });
+
+                /**
+                 * 送信前にJSONとしてhiddenに詰める
+                 */
+                $itemsForm.on('submit', function(e) {
+                    e.preventDefault();
+
+                    if (selectedItems.length === 0) {
+                        Swal.fire({
+                            title: 'エラー',
+                            text: '少なくとも1つの品目を選択してください。',
+                            icon: 'error',
+                            confirmButtonColor: '#ED4141'
+                        });
+                        return false;
+                    }
+
+                    $('#items-json').val(JSON.stringify(selectedItems));
+
+                    // ローディング表示
+                    Swal.fire({
+                        title: '処理中...',
+                        text: '品目を更新しています',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // AJAXで送信
+                    $.ajax({
+                        url: $itemsForm.attr('action'),
+                        method: 'POST',
+                        data: $itemsForm.serialize(),
+                        success: function(response) {
+                            // 確認ページにリダイレクト
+                            window.location.href = '{{ route("user.history.confirmation", ["id" => $selectedItem->id]) }}';
+                        },
+                        error: function(xhr) {
+                            let errorMessage = '品目の更新に失敗しました。';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            }
+
+                            Swal.fire({
+                                title: 'エラー',
+                                text: errorMessage,
+                                icon: 'error',
+                                confirmButtonColor: '#ED4141',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    });
+                });
 
                 // 初期データがあれば描画
                 if (selectedItems.length > 0) {
                     renderSelectedItems();
                 }
+
+                // 初期状態でボタンの状態を更新
+                updateSubmitButton();
             }
 
             // 地図表示ロジック（確認ページ用、読み取り専用）

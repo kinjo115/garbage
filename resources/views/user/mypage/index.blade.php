@@ -52,7 +52,7 @@
                         <span class="mypage-menu-arrow">▶</span>
                     </a>
 
-                    <a href="#" class="mypage-menu-item">
+                    <a href="{{ route('user.password.edit') }}" class="mypage-menu-item">
                         <span class="mypage-menu-text">パスワード変更</span>
                         <span class="mypage-menu-arrow">▶</span>
                     </a>
