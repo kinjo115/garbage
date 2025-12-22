@@ -11,6 +11,9 @@ use App\Http\Controllers\User\AuthenticationController as UserAuthenticationCont
 use App\Http\Controllers\User\TempUserController as UserTempUserController;
 use App\Http\Controllers\User\TempUserItemController as UserTempUserItemController;
 use App\Http\Controllers\User\TempUserPaymentController as UserTempUserPaymentController;
+use App\Http\Controllers\User\DashboardController as UserDashboardController;
+use App\Http\Controllers\User\UserInfoController;
+
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -58,7 +61,14 @@ Route::prefix('admin')->name('admin.')->middleware('guest')->group(function () {
 
 // Authenticated user routes
 Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
-    Route::get('dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
+    Route::get('mypage', [UserDashboardController::class, 'index'])->name('mypage');
+    Route::post('logout', [UserAuthenticationController::class, 'logout'])->name('logout');
+
+    Route::prefix('info')->name('info.')->group(function () {
+        Route::get('edit', [UserInfoController::class, 'editProfile'])->name('edit');
+        Route::post('edit', [UserInfoController::class, 'updateProfile'])->name('update');
+    });
+
 });
 
 // Route::view('dashboard', 'dashboard')

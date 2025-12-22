@@ -21,7 +21,14 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                return redirect(route('home'));
+                $user = Auth::guard($guard)->user();
+
+                // Redirect regular users to dashboard, admins to home (since they use Fortify)
+                if ($user && $user->role === \App\Models\User::ROLE['ADMIN']) {
+                    return redirect()->route('home');
+                }
+
+                return redirect()->route('user.mypage');
             }
         }
 

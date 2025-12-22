@@ -49,7 +49,7 @@ class AuthenticationController extends Controller
 
         // Authenticate with email and password
         if (Auth::attempt($request->only('email', 'password'))) {
-            return redirect()->route('home');
+            return redirect()->route('user.mypage');
         }
 
         return redirect()->route('user.login')->with('error', __('auth.failed'));
@@ -94,5 +94,14 @@ class AuthenticationController extends Controller
             return redirect()->route('guest.register')
                 ->with('error', __('messages.register_failed'));
         }
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('home')->with('success', 'ログアウトしました。');
     }
 }
