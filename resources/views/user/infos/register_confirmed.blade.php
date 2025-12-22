@@ -6,14 +6,14 @@
 @extends('layouts.app')
 
 @section('meta')
-    <title>新規申込みの登録 | 名古屋市ゴミ収集サイト</title>
-    <meta name="description" content="新規申込みの登録 | 名古屋市ゴミ収集サイト">
-    <meta name="keywords" content="新規申込みの登録,名古屋市,ゴミ収集,ゴミ収集サイト">
+    <title>{{ $tempUser->token ? '新規申込みの登録' : '会員情報変更' }} | 名古屋市ゴミ収集サイト</title>
+    <meta name="description" content="{{ $tempUser->token ? '新規申込みの登録' : '会員情報変更' }} | 名古屋市ゴミ収集サイト">
+    <meta name="keywords" content="{{ $tempUser->token ? '新規申込みの登録' : '会員情報変更' }},名古屋市,ゴミ収集,ゴミ収集サイト">
     <meta name="author" content="名古屋市ゴミ収集サイト">
-    <meta property="og:title" content="新規申込みの登録 | 名古屋市ゴミ収集サイト">
-    <meta property="og:description" content="新規申込みの登録 | 名古屋市ゴミ収集サイト">
+    <meta property="og:title" content="{{ $tempUser->token ? '新規申込みの登録' : '会員情報変更' }} | 名古屋市ゴミ収集サイト">
+    <meta property="og:description" content="{{ $tempUser->token ? '新規申込みの登録' : '会員情報変更' }} | 名古屋市ゴミ収集サイト">
     <meta property="og:image" content="{{ asset('assets/images/ogp.png') }}">
-    <meta property="og:url" content="{{ route('guest.register.confirm', ['token' => $tempUser->token]) }}">
+    <meta property="og:url" content="{{ $tempUser->token ? route('guest.register.confirm', ['token' => $tempUser->token]) : route('user.info.edit') }}">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ja_JP">
     <meta property="og:site_name" content="名古屋市ゴミ収集サイト">
@@ -26,30 +26,51 @@
                 <div class="breadcrumbs-item">
                     <a href="{{ route('home') }}">ホーム</a>
                 </div>
-                <div class="breadcrumbs-item">
-                    <span>新規申込みの登録</span>
-                </div>
+                @if($tempUser->token)
+                    <div class="breadcrumbs-item">
+                        <span>新規申込みの登録</span>
+                    </div>
+                @else
+                    <div class="breadcrumbs-item">
+                        <a href="{{ route('user.mypage') }}">マイページ</a>
+                    </div>
+                    <div class="breadcrumbs-item">
+                        <span>会員情報変更</span>
+                    </div>
+                @endif
             </div>
             <div class="page-content form-content">
                 <div class="page-header">
-                    <h1 class="page-title">新規申込みの登録</h1>
+                    <h1 class="page-title">{{ $tempUser->token ? '新規申込みの登録' : '会員情報変更' }}</h1>
                 </div>
-                <div class="form-description">
-                    <p class="text-E20000">申込む前に必ずお読みください</p>
-                    <br>
-                    <p>・名古屋市に在住の方のみ、お申し込みができます。</p>
-                    <p>・第三者によるお申し込みはできません。必ず粗大ごみの所有者本人、もしくは同居の家族の方が申し込んでください。</p>
-                    <p>・(*)のある項目は必須項目です。</p>
-                    <p>・町名は、「町丁目を選択する」ボタンを押して住所検索画面から選択します。（直接入力はできません）</p>
-                    <p>・番地は、数字で入力してください。</p>
-                    <p>・電話番号と緊急連絡先はハイフンなしで入力してください。</p>
-                </div>
-                <div class="form-description mt-16">
-                    <div class="text-E20000 mb-4">注意事項</div>
-                    <p>・お申し込みの途中に前の画面に戻る場合は、必ず各画面の「戻る」ボタンをクリックしてください。</p>
-                    <p>※ブラウザの「戻る」機能は使用しないでください。</p>
-                </div>
-                <form action="{{ route('guest.register.confirm.store', ['token' => $tempUser->token]) }}" method="POST"
+                @if($tempUser->token)
+                    <div class="form-description">
+                        <p class="text-E20000">申込む前に必ずお読みください</p>
+                        <br>
+                        <p>・名古屋市に在住の方のみ、お申し込みができます。</p>
+                        <p>・第三者によるお申し込みはできません。必ず粗大ごみの所有者本人、もしくは同居の家族の方が申し込んでください。</p>
+                        <p>・(*)のある項目は必須項目です。</p>
+                        <p>・町名は、「町丁目を選択する」ボタンを押して住所検索画面から選択します。（直接入力はできません）</p>
+                        <p>・番地は、数字で入力してください。</p>
+                        <p>・電話番号と緊急連絡先はハイフンなしで入力してください。</p>
+                    </div>
+                    <div class="form-description mt-16">
+                        <div class="text-E20000 mb-4">注意事項</div>
+                        <p>・お申し込みの途中に前の画面に戻る場合は、必ず各画面の「戻る」ボタンをクリックしてください。</p>
+                        <p>※ブラウザの「戻る」機能は使用しないでください。</p>
+                    </div>
+                @else
+                    <div class="form-description">
+                        <p class="text-E20000">会員情報変更について</p>
+                        <br>
+                        <p>・(*)のある項目は必須項目です。</p>
+                        <p>・郵便番号を入力後、「住所を反映する」ボタンをクリックすると、住所が自動入力されます。</p>
+                        <p>・番地は、数字で入力してください。</p>
+                        <p>・電話番号と緊急連絡先はハイフンなしで入力してください。</p>
+                        <p>・メールアドレスは変更できません。</p>
+                    </div>
+                @endif
+                <form action="{{ $tempUser->token ? route('guest.register.confirm.store', ['token' => $tempUser->token]) : route('user.info.update') }}" method="POST"
                     class="mt-16">
                     @csrf
                     <div class="grid md:grid-cols-2 grid-cols-1 gap-2">
@@ -112,7 +133,7 @@
                         <div class="form-input-wrapper">
                             <div class="flex flex-wrap gap-2">
                                 <input type="text" name="postal_code" id="postal_code" class="form-input max-w-1/2"
-                                    value="{{ old('postal_code', $tempUser->userInfo ? $tempUser->userInfo->postal_code : '') }}"
+                                    value="{{ old('postal_code', $tempUser->userInfo && $tempUser->userInfo->postal_code ? (strlen($tempUser->userInfo->postal_code) === 7 ? substr($tempUser->userInfo->postal_code, 0, 3) . '-' . substr($tempUser->userInfo->postal_code, 3) : $tempUser->userInfo->postal_code) : '') }}"
                                     required>
                                 <button type="button" class="form-btn" id="fetch-address-btn">住所を反映する</button>
                             </div>
@@ -288,16 +309,29 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="text-center mt-10">
-                        <p>上記の入力内容を確認し、内容に誤りがなければ</p>
-                        <p>「地図の登録に進む」ボタンをクリックしてください。</p>
-                    </div>
-                    <div class="form-submit">
-                        <button type="submit" class="c-button btn-416FED">地図の登録に進む</button>
-                    </div>
-                    <div class="md:mt-16 mt-10 flex justify-center">
-                        <a href="{{ route('guest.register') }}" class="c-btn-black">戻る</a>
-                    </div>
+                    @if($tempUser->token)
+                        <div class="text-center mt-10">
+                            <p>上記の入力内容を確認し、内容に誤りがなければ</p>
+                            <p>「地図の登録に進む」ボタンをクリックしてください。</p>
+                        </div>
+                        <div class="form-submit">
+                            <button type="submit" class="c-button btn-416FED">地図の登録に進む</button>
+                        </div>
+                        <div class="md:mt-16 mt-10 flex justify-center">
+                            <a href="{{ route('guest.register') }}" class="c-btn-black">戻る</a>
+                        </div>
+                    @else
+                        <div class="text-center mt-10">
+                            <p>上記の入力内容を確認し、内容に誤りがなければ</p>
+                            <p>「会員情報を更新する」ボタンをクリックしてください。</p>
+                        </div>
+                        <div class="form-submit">
+                            <button type="submit" class="c-button btn-416FED">会員情報を更新する</button>
+                        </div>
+                        <div class="md:mt-16 mt-10 flex justify-center">
+                            <a href="{{ route('user.mypage') }}" class="c-btn-black">戻る</a>
+                        </div>
+                    @endif
                 </form>
             </div>
         </div>

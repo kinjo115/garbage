@@ -36,7 +36,7 @@
                         <span class="mypage-menu-arrow">▶</span>
                     </a>
 
-                    <a href="#" class="mypage-menu-item">
+                    <a href="{{ route('user.history.index') }}" class="mypage-menu-item">
                         <span class="mypage-menu-text">申込み履歴</span>
                         <span class="mypage-menu-arrow">▶</span>
                     </a>
@@ -47,7 +47,7 @@
 
                     <div class="mypage-separator"></div>
 
-                    <a href="#" class="mypage-menu-item">
+                    <a href="{{ route('user.info.edit') }}" class="mypage-menu-item">
                         <span class="mypage-menu-text">会員情報変更</span>
                         <span class="mypage-menu-arrow">▶</span>
                     </a>

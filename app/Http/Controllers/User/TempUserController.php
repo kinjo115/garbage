@@ -19,7 +19,7 @@ class TempUserController extends Controller
             return abort(404);
         }
 
-        return view('user.temp_user.register_confirmed', compact('tempUser'));
+        return view('user.infos.register_confirmed', compact('tempUser'));
     }
 
     /**
@@ -140,7 +140,7 @@ class TempUserController extends Controller
 
         $address = implode(' ', $addressParts);
 
-        return view('user.temp_user.register_confirmed_map', compact('tempUser', 'address'));
+        return view('user.infos.register_confirmed_map', compact('tempUser', 'address'));
     }
 
     /**

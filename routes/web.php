@@ -13,6 +13,7 @@ use App\Http\Controllers\User\TempUserItemController as UserTempUserItemControll
 use App\Http\Controllers\User\TempUserPaymentController as UserTempUserPaymentController;
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\User\UserInfoController;
+use App\Http\Controllers\User\HistoryController as UserHistoryController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -67,6 +68,16 @@ Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
     Route::prefix('info')->name('info.')->group(function () {
         Route::get('edit', [UserInfoController::class, 'editProfile'])->name('edit');
         Route::post('edit', [UserInfoController::class, 'updateProfile'])->name('update');
+
+        Route::get('map', [UserInfoController::class, 'editMap'])->name('map');
+        Route::post('map', [UserInfoController::class, 'updateMap'])->name('map.update');
+        Route::post('map/cancel', [UserInfoController::class, 'cancelMap'])->name('map.cancel');
+    });
+
+    Route::prefix('history')->name('history.')->group(function () {
+        Route::get('index', [UserHistoryController::class, 'index'])->name('index');
+        Route::get('show/{id}', [UserHistoryController::class, 'show'])->name('show');
+        Route::post('cancel', [UserHistoryController::class, 'cancel'])->name('cancel');
     });
 
 });

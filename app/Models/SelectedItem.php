@@ -12,6 +12,7 @@ class SelectedItem extends Model
 
     const CONFIRM_STATUS_NOT_CONFIRMED = 0;
     const CONFIRM_STATUS_CONFIRMED = 1;
+    const CONFIRM_STATUS_CANCELLED = 2;
 
     protected $fillable = [
         'temp_user_id',

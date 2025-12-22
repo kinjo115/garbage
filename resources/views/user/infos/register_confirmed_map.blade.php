@@ -8,7 +8,7 @@
     <meta property="og:title" content="地図登録 | 名古屋市ゴミ収集サイト">
     <meta property="og:description" content="地図登録 | 名古屋市ゴミ収集サイト">
     <meta property="og:image" content="{{ asset('assets/images/ogp.png') }}">
-    <meta property="og:url" content="{{ route('guest.register.confirm.store.map', ['token' => $tempUser->token]) }}">
+    <meta property="og:url" content="{{ $tempUser->token ? route('guest.register.confirm.store.map', ['token' => $tempUser->token]) : route('user.info.map') }}">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ja_JP">
     <meta property="og:site_name" content="名古屋市ゴミ収集サイト">
@@ -21,9 +21,18 @@
                 <div class="breadcrumbs-item">
                     <a href="{{ route('home') }}">ホーム</a>
                 </div>
-                <div class="breadcrumbs-item">
-                    <span>地図登録</span>
-                </div>
+                @if($tempUser->token)
+                    <div class="breadcrumbs-item">
+                        <span>地図登録</span>
+                    </div>
+                @else
+                    <div class="breadcrumbs-item">
+                        <a href="{{ route('user.mypage') }}">マイページ</a>
+                    </div>
+                    <div class="breadcrumbs-item">
+                        <span>地図登録</span>
+                    </div>
+                @endif
             </div>
             <div class="page-content form-content">
                 <div class="page-header">
@@ -53,7 +62,7 @@
                     <p>・位置の指定方法が分からない場合や、地図上で位置を確認できない場合は、「場所の指定ができない」ボタンをクリックして申し込みを中止し、電話でお申し込みください。</p>
                     <p>・排出位置は選択していただいた場所から修正させていただくことがございますので、必ず前日お知らせメールで排出位置をご確認ください</p>
                 </div>
-                <form action="{{ route('guest.register.confirm.store.map.save', ['token' => $tempUser->token]) }}"
+                <form action="{{ $tempUser->token ? route('guest.register.confirm.store.map.save', ['token' => $tempUser->token]) : route('user.info.map.update') }}"
                     method="POST" class="mt-10" id="map-form">
                     @csrf
                     <div class="form-group">
@@ -108,15 +117,24 @@
 
                     <div class="mt-10">
                         <div class="">
-                            <button type="submit" class="c-button btn-416FED" id="submit-btn">品目入力に進む</button>
+                            @if($tempUser->token)
+                                <button type="submit" class="c-button btn-416FED" id="submit-btn">品目入力に進む</button>
+                            @else
+                                <button type="submit" class="c-button btn-416FED" id="submit-btn">地図登録を完了する</button>
+                            @endif
                         </div>
                         <div class="mt-6">
                             <button type="button" class="c-button btn-ED4141" id="cancel-btn">場所の指定が出来ない</button>
                         </div>
 
                         <div class="md:mt-16 mt-10 flex justify-center">
-                            <a href="{{ route('guest.register.confirm', ['token' => $tempUser->token]) }}"
-                                class="c-btn-black">戻る</a>
+                            @if($tempUser->token)
+                                <a href="{{ route('guest.register.confirm', ['token' => $tempUser->token]) }}"
+                                    class="c-btn-black">戻る</a>
+                            @else
+                                <a href="{{ route('user.info.edit') }}"
+                                    class="c-btn-black">戻る</a>
+                            @endif
                         </div>
                     </div>
                 </form>
@@ -514,7 +532,7 @@
                         const form = document.createElement('form');
                         form.method = 'POST';
                         form.action =
-                            '{{ route('guest.register.confirm.store.map.cancel', ['token' => $tempUser->token]) }}';
+                            '{{ $tempUser->token ? route('guest.register.confirm.store.map.cancel', ['token' => $tempUser->token]) : route('user.info.map.cancel') }}';
 
                         // CSRFトークンを追加
                         const csrfToken = document.createElement('input');

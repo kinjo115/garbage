@@ -21,6 +21,16 @@ class UserInfoRequest extends FormRequest
      */
     public function rules(): array
     {
+        $user = auth()->user();
+        $emailRule = ['required', 'email'];
+        
+        // 認証済みユーザーの場合、自分のメールアドレスはuniqueチェックから除外
+        if ($user) {
+            $emailRule[] = 'unique:users,email,' . $user->id;
+        } else {
+            $emailRule[] = 'unique:users,email';
+        }
+
         return [
             'last_name' => 'required|string|max:50',
             'first_name' => 'required|string|max:50',
@@ -36,7 +46,7 @@ class UserInfoRequest extends FormRequest
             'apartment_number' => 'nullable|string|max:30',
             'phone_number' => ['required', 'string', 'regex:/^[\d-]{10,15}$/'],
             'emergency_contact' => ['required', 'string', 'regex:/^[\d-]{10,15}$/'],
-            'email' => ['required', 'email', 'unique:users,email'],
+            'email' => $emailRule,
         ];
     }
 
