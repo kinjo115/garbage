@@ -19,15 +19,15 @@ class RegistrationTest extends TestCase
     public function test_new_users_can_register(): void
     {
         $response = $this->post(route('guest.register.store'), [
-            'name' => 'John Doe',
             'email' => 'test@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
+            'privacy_policy' => '1',
         ]);
 
         $response->assertSessionHasNoErrors()
-            ->assertRedirect(route('user.mypage', absolute: false));
+            ->assertStatus(200)
+            ->assertViewIs('user.auth.register_created');
 
-        $this->assertAuthenticated();
+        // Registration creates a TempUser, not a User, so user is not authenticated
+        $this->assertGuest();
     }
 }
