@@ -8,7 +8,7 @@
     <meta property="og:title" content="支払い方法 | 名古屋市ゴミ収集サイト">
     <meta property="og:description" content="支払い方法 | 名古屋市ゴミ収集サイト">
     <meta property="og:image" content="{{ asset('assets/images/ogp.png') }}">
-    <meta property="og:url" content="{{ route('guest.register.confirm.store.map', ['token' => $tempUser->token]) }}">
+    <meta property="og:url" content="{{ $tempUser->token ? route('guest.register.confirm.store.map', ['token' => $tempUser->token]) : route('user.payment.index', ['id' => $selected->id]) }}">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ja_JP">
     <meta property="og:site_name" content="名古屋市ゴミ収集サイト">
@@ -21,9 +21,18 @@
                 <div class="breadcrumbs-item">
                     <a href="{{ route('home') }}">ホーム</a>
                 </div>
-                <div class="breadcrumbs-item">
-                    <span>支払い方法</span>
-                </div>
+                @if($tempUser->token)
+                    <div class="breadcrumbs-item">
+                        <span>支払い方法</span>
+                    </div>
+                @else
+                    <div class="breadcrumbs-item">
+                        <a href="{{ route('user.mypage') }}">マイページ</a>
+                    </div>
+                    <div class="breadcrumbs-item">
+                        <span>支払い方法</span>
+                    </div>
+                @endif
             </div>
 
             <div class="page-content form-content">
@@ -38,7 +47,7 @@
                     <p>・コンビニで排出券を購入する場合は、申込みが完了し、コンビニでの購入方法が表示されます。期日までに対応してください。</p>
                     <p>・オンライン支払いの場合は、支払いが確定しなければ、申し込みが完了しません。</p>
                 </div>
-                <form action="{{ route('guest.payment.store', ['token' => $tempUser->token]) }}" method="POST">
+                <form action="{{ $tempUser->token ? route('guest.payment.store', ['token' => $tempUser->token]) : route('user.payment.store', ['id' => $selected->id]) }}" method="POST">
                     @csrf
                     <input type="hidden" name="payment_method" value="convenience">
                     <div class="form-submit">
@@ -46,7 +55,7 @@
                     </div>
                 </form>
 
-                <form action="{{ route('guest.payment.store', ['token' => $tempUser->token]) }}" method="POST">
+                <form action="{{ $tempUser->token ? route('guest.payment.store', ['token' => $tempUser->token]) : route('user.payment.store', ['id' => $selected->id]) }}" method="POST">
                     @csrf
                     <input type="hidden" name="payment_method" value="online">
                     <div class="form-submit mt-6">

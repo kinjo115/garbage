@@ -22,7 +22,12 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Redirect unauthenticated users to user/login for user/* routes
+        $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, \Illuminate\Http\Request $request) {
+            if ($request->is('user/*')) {
+                return redirect()->route('user.login');
+            }
+        });
     })
     ->withSchedule(function (Schedule $schedule): void {
 

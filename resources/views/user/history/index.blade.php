@@ -92,7 +92,7 @@
                                 </div>
                                 @if(!$isCancelled)
                                     <div class="history-card-actions">
-                                        <a href="{{ route('user.history.show', ['id' => $item->id]) }}" class="history-btn history-btn-change">品目を変更する</a>
+                                        <a href="{{ route('user.items.show', ['id' => $item->id]) }}" class="history-btn history-btn-change">品目を変更する</a>
                                         <button type="button" class="history-btn history-btn-cancel" data-item-id="{{ $item->id }}">キャンセルする</button>
                                     </div>
                                 @endif
@@ -159,7 +159,7 @@
 
                         // キャンセル処理を実行
                         $.ajax({
-                            url: '{{ route("user.history.cancel") }}',
+                            url: '{{ route("user.items.cancel") }}',
                             method: 'POST',
                             data: {
                                 _token: '{{ csrf_token() }}',

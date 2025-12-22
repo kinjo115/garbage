@@ -31,7 +31,7 @@ class TempUserItemController extends Controller
 
         $initialSelectedItems = $selected?->selected_items ?? [];
 
-        return view('user.temp_user.item.index', compact('tempUser', 'items', 'initialSelectedItems'));
+        return view('user.item.index', compact('tempUser', 'items', 'initialSelectedItems'));
     }
 
     /**
@@ -141,7 +141,7 @@ class TempUserItemController extends Controller
         // 次回の第2水曜日を計算
         $nextSecondWednesday = $this->getNextSecondWednesday();
 
-        return view('user.temp_user.item.confirmation', compact('tempUser', 'selected', 'initialSelectedItems', 'nextSecondWednesday'));
+        return view('user.item.confirmation', compact('tempUser', 'selected', 'initialSelectedItems', 'nextSecondWednesday'));
     }
 
     /**

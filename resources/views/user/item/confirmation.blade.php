@@ -8,7 +8,7 @@
     <meta property="og:title" content="申込内容の確認 | 名古屋市ゴミ収集サイト">
     <meta property="og:description" content="申込内容の確認 | 名古屋市ゴミ収集サイト">
     <meta property="og:image" content="{{ asset('assets/images/ogp.png') }}">
-    <meta property="og:url" content="{{ route('user.history.confirmation', ['id' => $selectedItem->id]) }}">
+    <meta property="og:url" content="{{ $tempUser->token ? route('guest.register.confirm.store.map', ['token' => $tempUser->token]) : route('user.items.confirmation') }}">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ja_JP">
     <meta property="og:site_name" content="名古屋市ゴミ収集サイト">
@@ -21,21 +21,24 @@
                 <div class="breadcrumbs-item">
                     <a href="{{ route('home') }}">ホーム</a>
                 </div>
-                <div class="breadcrumbs-item">
-                    <a href="{{ route('user.mypage') }}">マイページ</a>
-                </div>
-                <div class="breadcrumbs-item">
-                    <a href="{{ route('user.history.index') }}">申込み履歴</a>
-                </div>
-                <div class="breadcrumbs-item">
-                    <span>申込内容の確認</span>
-                </div>
+                @if($tempUser->token)
+                    <div class="breadcrumbs-item">
+                        <span>申込内容の確認</span>
+                    </div>
+                @else
+                    <div class="breadcrumbs-item">
+                        <a href="{{ route('user.mypage') }}">マイページ</a>
+                    </div>
+                    <div class="breadcrumbs-item">
+                        <span>申込内容の確認</span>
+                    </div>
+                @endif
             </div>
             <div class="page-content form-content">
                 <div class="page-header">
                     <h1 class="page-title">申込内容の確認</h1>
                 </div>
-                <form action="{{ route('user.history.confirmation.store', ['id' => $selectedItem->id]) }}" method="POST"
+                <form action="{{ $tempUser->token ? route('guest.confirmation.store', ['token' => $tempUser->token]) : route('user.items.confirmation.store', $id ? ['id' => $id] : []) }}" method="POST"
                     id="confirmation-form">
                     @csrf
                     <div class="form-notification">まだ申込みは完了していません</div>
@@ -55,7 +58,7 @@
                             <h2 class="text-4xl font-bold text-center">基本情報</h2>
                         </div>
                         <div class="mt-10 grid grid-cols-1 gap-2 w-full max-w-xl mx-auto">
-                            @if($receptionNumber)
+                            @if(isset($receptionNumber) && $receptionNumber)
                                 <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
                                     <div class="label w-full max-w-[120px] text-right">受付番号</div>
                                     <div class="w-full flex-1">
@@ -67,47 +70,47 @@
                                 <div class="label w-full max-w-[120px] text-right">名前</div>
                                 <div class="w-full flex-1">
                                     <input type="text" readonly class="form-input"
-                                        value="{{ $userInfo->last_name }} {{ $userInfo->first_name }}">
+                                        value="{{ $tempUser->userInfo->last_name }} {{ $tempUser->userInfo->first_name }}">
                                 </div>
                             </div>
                             <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
                                 <div class="label w-full max-w-[120px] text-right">郵便番号</div>
                                 <div class="w-full flex-1">
                                     <input type="text" readonly class="form-input"
-                                        value="{{ $userInfo->postal_code ? substr($userInfo->postal_code, 0, 3) . '-' . substr($userInfo->postal_code, 3) : '-' }}">
+                                        value="{{ $tempUser->userInfo->postal_code ? (strlen($tempUser->userInfo->postal_code) === 7 ? substr($tempUser->userInfo->postal_code, 0, 3) . '-' . substr($tempUser->userInfo->postal_code, 3) : $tempUser->userInfo->postal_code) : '-' }}">
                                 </div>
                             </div>
                             <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
                                 <div class="label w-full max-w-[120px] text-right">住所</div>
                                 <div class="w-full flex-1">
                                     <input type="text" readonly class="form-input"
-                                        value="{{ ($userInfo->prefecture->name ?? '') }} {{ $userInfo->city ?? '' }} {{ $userInfo->town ?? '' }} {{ $userInfo->chome ?? '' }} {{ $userInfo->building_number ?? '' }} {{ $userInfo->house_number ?? '' }} {{ $userInfo->apartment_name ?? '' }} {{ $userInfo->apartment_number ?? '' }}">
+                                        value="{{ ($tempUser->userInfo->prefecture->name ?? '') }} {{ $tempUser->userInfo->city ?? '' }} {{ $tempUser->userInfo->town ?? '' }} {{ $tempUser->userInfo->chome ?? '' }} {{ $tempUser->userInfo->building_number ?? '' }} {{ $tempUser->userInfo->house_number ?? '' }} {{ $tempUser->userInfo->apartment_name ?? '' }} {{ $tempUser->userInfo->apartment_number ?? '' }}">
                                 </div>
                             </div>
                             <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
                                 <div class="label w-full max-w-[120px] text-right">電話番号</div>
                                 <div class="w-full flex-1">
                                     <input type="text" readonly class="form-input"
-                                        value="{{ $userInfo->phone_number ?? '-' }}">
+                                        value="{{ $tempUser->userInfo->phone_number ?? '-' }}">
                                 </div>
                             </div>
                             <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
                                 <div class="label w-full max-w-[120px] text-right">緊急連絡先</div>
                                 <div class="w-full flex-1">
                                     <input type="text" readonly class="form-input"
-                                        value="{{ $userInfo->emergency_contact ?? '-' }}">
+                                        value="{{ $tempUser->userInfo->emergency_contact ?? '-' }}">
                                 </div>
                             </div>
                             <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
                                 <div class="label w-full max-w-[120px] text-right">メールアドレス</div>
                                 <div class="w-full flex-1">
                                     <input type="text" readonly class="form-input"
-                                        value="{{ $userInfo->user->email ?? '-' }}">
+                                        value="{{ $tempUser->email ?? '-' }}">
                                 </div>
                             </div>
                         </div>
 
-                        @if($userInfo->home_latitude && $userInfo->home_longitude)
+                        @if($tempUser->userInfo->home_latitude && $tempUser->userInfo->home_longitude)
                             <div class="mt-10">
                                 <p class="text-center">ごみの排出位置は下の地図で確認してください。</p>
                                 <p class="text-center">※排出位置が誤っていないかご確認ください。</p>
@@ -119,23 +122,23 @@
                                     style="width: 100%; height: 600px; border: 1px solid #ccc; border-radius: 5px;">
                                 </div>
                             </div>
-
-                            <!-- 位置情報の隠しフィールド -->
-                            <input type="hidden" name="home_latitude" id="home_latitude"
-                                value="{{ $userInfo->home_latitude ?? '' }}">
-                            <input type="hidden" name="home_longitude" id="home_longitude"
-                                value="{{ $userInfo->home_longitude ?? '' }}">
-                            <input type="hidden" name="disposal_latitude" id="disposal_latitude"
-                                value="{{ $userInfo->disposal_latitude ?? '' }}">
-                            <input type="hidden" name="disposal_longitude" id="disposal_longitude"
-                                value="{{ $userInfo->disposal_longitude ?? '' }}">
-
-                            <!-- 住所情報（地図の初期表示用） -->
-                            <input type="hidden" id="user_address"
-                                value="{{ ($userInfo->prefecture->name ?? '') }} {{ $userInfo->city ?? '' }} {{ $userInfo->town ?? '' }}">
-                            <input type="hidden" id="user_postal_code"
-                                value="{{ $userInfo->postal_code ?? '' }}">
                         @endif
+
+                        <!-- 位置情報の隠しフィールド -->
+                        <input type="hidden" name="home_latitude" id="home_latitude"
+                            value="{{ $tempUser->userInfo?->home_latitude ?? '' }}">
+                        <input type="hidden" name="home_longitude" id="home_longitude"
+                            value="{{ $tempUser->userInfo?->home_longitude ?? '' }}">
+                        <input type="hidden" name="disposal_latitude" id="disposal_latitude"
+                            value="{{ $tempUser->userInfo?->disposal_latitude ?? '' }}">
+                        <input type="hidden" name="disposal_longitude" id="disposal_longitude"
+                            value="{{ $tempUser->userInfo?->disposal_longitude ?? '' }}">
+
+                        <!-- 住所情報（地図の初期表示用） -->
+                        <input type="hidden" id="user_address"
+                            value="{{ $tempUser->userInfo?->prefecture?->name ?? '' }} {{ $tempUser->userInfo?->city ?? '' }} {{ $tempUser->userInfo?->town ?? '' }}">
+                        <input type="hidden" id="user_postal_code"
+                            value="{{ $tempUser->userInfo?->postal_code ?? '' }}">
 
                         <div class="mt-16">
                             <div class="selected-items mt-16" data-initial-items='@json($initialSelectedItems ?? [])'>
@@ -160,7 +163,7 @@
                             <p>・基本情報または排出位置を変更したい場合は「基本情報に戻る」ボタンをクリックしてください。</p>
                             <p>・入力した品目内容を変更したい場合は「品目選択に戻る」ボタンをクリックしてください。</p>
                             <p>・申込みを中止したい場合は「申込みを中止する」ボタンをクリックしてください。</p>
-                            <p>・内容に間違いがなければ、同意欄にチェックのうえ、「確認完了」ボタンをクリックしてください。</p>
+                            <p>・内容に間違いがなければ、同意欄にチェックのうえ、「{{ $tempUser->token ? '支払い方法に進む' : '確認完了' }}」ボタンをクリックしてください。</p>
                         </div>
                     </div>
 
@@ -187,9 +190,24 @@
                     {{-- ナビゲーションボタン --}}
                     <div class="navigation-buttons mt-16">
                         <div class="flex flex-wrap gap-4 justify-center">
-                            <a href="{{ route('user.info.edit') }}" class="c-btn-black">基本情報に戻る</a>
-                            <a href="{{ route('user.history.show', ['id' => $selectedItem->id]) }}"
-                                class="c-btn-black">品目選択に戻る</a>
+                            @if($tempUser->token)
+                                <a href="{{ route('guest.register.confirm.store.map', ['token' => $tempUser->token]) }}"
+                                    class="c-btn-black">基本情報に戻る</a>
+                                <a href="{{ route('guest.item.index', ['token' => $tempUser->token]) }}"
+                                    class="c-btn-black">品目選択に戻る</a>
+                            @else
+                                @if($id)
+                                    <a href="{{ route('user.info.edit') }}"
+                                        class="c-btn-black">基本情報に戻る</a>
+                                    <a href="{{ route('user.items.show', ['id' => $id]) }}"
+                                        class="c-btn-black">品目選択に戻る</a>
+                                @else
+                                    <a href="{{ route('user.info.edit') }}"
+                                        class="c-btn-black">基本情報に戻る</a>
+                                    <a href="{{ route('user.items.index') }}"
+                                        class="c-btn-black">品目選択に戻る</a>
+                                @endif
+                            @endif
                             <button type="button" class="c-btn-black" id="cancel-application-btn">申込みを中止する</button>
                         </div>
                     </div>
@@ -197,7 +215,7 @@
                     {{-- 送信ボタン --}}
                     <div class="form-submit mt-16">
                         <button type="submit" class="c-button btn-416FED" id="proceed-payment-btn" disabled>
-                            確認完了
+                            {{ $tempUser->token ? '支払い方法に進む' : '確認完了' }}
                         </button>
                     </div>
                 </form>
@@ -280,7 +298,7 @@
                 updateProceedButton();
             });
 
-            // 確認完了ボタンの有効/無効を更新
+            // 支払い方法に進むボタンの有効/無効を更新
             function updateProceedButton() {
                 const agreeChecked = $('#agree_terms').is(':checked');
                 $('#proceed-payment-btn').prop('disabled', !agreeChecked);
@@ -292,12 +310,15 @@
 
                 if (!agreeChecked) {
                     e.preventDefault();
-                    Swal.fire({
-                        title: 'エラー',
+                    Toastify({
                         text: '「以上の内容に同意する」にチェックを入れてください。',
-                        icon: 'error',
-                        confirmButtonColor: '#ED4141'
-                    });
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "linear-gradient(to right, #ff6b6b, #ee5a6f)",
+                        }
+                    }).showToast();
                     return false;
                 }
             });
@@ -318,13 +339,17 @@
                     focusCancel: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        window.location.href = '{{ route('user.history.index') }}';
+                        @if($tempUser->token)
+                            window.location.href = '{{ route('home') }}';
+                        @else
+                            window.location.href = '{{ route('user.mypage') }}';
+                        @endif
                     }
                 });
             });
 
             // 地図表示ロジック（確認ページ用、読み取り専用）
-            @if (config('services.google_maps.api_key') && $userInfo->home_latitude && $userInfo->home_longitude)
+            @if (config('services.google_maps.api_key'))
                 // Google Maps APIが読み込まれるまで待つ
                 if (typeof google !== 'undefined' && typeof google.maps !== 'undefined') {
                     window.initConfirmationMap();
@@ -338,10 +363,8 @@
                     }, 100);
                 }
             @else
-                @if($userInfo->home_latitude && $userInfo->home_longitude)
-                    document.getElementById('map').innerHTML =
-                        '<div style="padding: 20px; text-align: center; color: #666;">Google Maps APIキーが設定されていません。</div>';
-                @endif
+                document.getElementById('map').innerHTML =
+                    '<div style="padding: 20px; text-align: center; color: #666;">Google Maps APIキーが設定されていません。</div>';
             @endif
         });
 
@@ -412,7 +435,8 @@
             // 地図の読み込み完了を待ってからマーカーを表示
             google.maps.event.addListenerOnce(map, 'idle', function() {
                 // 自宅位置マーカーを表示
-                if (homeLat && homeLng && !isNaN(homeLat) && !isNaN(homeLng) && homeLat !== 0 && homeLng !== 0) {
+                if (homeLat && homeLng && !isNaN(homeLat) && !isNaN(homeLng) && homeLat !== 0 && homeLng !==
+                    0) {
                     const homeIconSvg = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
                         <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="#FF0000">
                             <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
@@ -437,7 +461,8 @@
                 }
 
                 // 排出位置マーカーを表示
-                if (disposalLat && disposalLng && !isNaN(disposalLat) && !isNaN(disposalLng) && disposalLat !== 0 && disposalLng !== 0) {
+                if (disposalLat && disposalLng && !isNaN(disposalLat) && !isNaN(disposalLng) && disposalLat !==
+                    0 && disposalLng !== 0) {
                     const disposalIconSvg = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
                         <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="#4169E1">
                             <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
@@ -479,10 +504,9 @@
     </script>
 
     <!-- Google Maps API -->
-    @if (config('services.google_maps.api_key') && $userInfo->home_latitude && $userInfo->home_longitude)
+    @if (config('services.google_maps.api_key'))
         <script
             src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.api_key') }}&language=ja&region=JP&libraries=geometry&callback=initConfirmationMap"
             async defer></script>
     @endif
 @endsection
-

@@ -16,6 +16,8 @@ use App\Http\Controllers\User\UserInfoController;
 use App\Http\Controllers\User\HistoryController as UserHistoryController;
 use App\Http\Controllers\User\UserPasswordController;
 use App\Http\Controllers\User\WithdrawController as UserWithdrawController;
+use App\Http\Controllers\User\ItemsController as UserItemsController;
+use App\Http\Controllers\User\UserPaymentController;
 
 
 
@@ -78,12 +80,26 @@ Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
     });
 
     Route::prefix('history')->name('history.')->group(function () {
-        Route::get('index', [UserHistoryController::class, 'index'])->name('index');
-        Route::get('show/{id}', [UserHistoryController::class, 'show'])->name('show');
-        Route::post('cancel', [UserHistoryController::class, 'cancel'])->name('cancel');
-        Route::post('update-items/{id}', [UserHistoryController::class, 'updateItems'])->name('update-items');
-        Route::get('confirmation/{id}', [UserHistoryController::class, 'confirmation'])->name('confirmation');
-        Route::post('confirmation/{id}', [UserHistoryController::class, 'confirmationStore'])->name('confirmation.store');
+        Route::get('/', [UserHistoryController::class, 'index'])->name('index');
+    });
+
+    Route::prefix('items')->name('items.')->group(function () {
+        Route::get('/', [UserItemsController::class, 'index'])->name('index');
+        Route::post('/', [UserItemsController::class, 'store'])->name('store');
+        Route::get('/show/{id}', [UserItemsController::class, 'show'])->name('show');
+        Route::post('cancel', [UserItemsController::class, 'cancel'])->name('cancel');
+        Route::post('update-items/{id}', [UserItemsController::class, 'updateItems'])->name('update-items');
+        Route::get('confirmation/{id?}', [UserItemsController::class, 'confirmation'])->name('confirmation');
+        Route::post('confirmation/{id?}', [UserItemsController::class, 'confirmationStore'])->name('confirmation.store');
+    });
+
+    Route::prefix('payment')->name('payment.')->group(function () {
+        Route::get('{id}', [UserPaymentController::class, 'index'])->name('index');
+        Route::post('{id}', [UserPaymentController::class, 'store'])->name('store');
+        Route::get('convenience/{id}', [UserPaymentController::class, 'convenience'])->name('convenience');
+        Route::match(['get', 'post'], 'callback/{id}', [UserPaymentController::class, 'callback'])->name('callback');
+        Route::get('cancel/{id}', [UserPaymentController::class, 'cancel'])->name('cancel');
+        Route::get('complete/{id}', [UserPaymentController::class, 'complete'])->name('complete');
     });
 
     Route::prefix('password')->name('password.')->group(function () {

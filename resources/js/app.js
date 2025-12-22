@@ -378,7 +378,7 @@ $(document).ready(function() {
     });
 
     /**
-     * 品目選択ロジック（user.temp_user.item.index）
+     * 品目選択ロジック（user.item.index）
      */
     const $itemsForm = $('#items-form');
     if ($itemsForm.length) {

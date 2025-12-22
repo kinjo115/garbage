@@ -31,7 +31,7 @@
                 </div>
 
                 <div class="mypage-menu">
-                    <a href="#" class="mypage-menu-item">
+                    <a href="{{ route('user.items.index') }}" class="mypage-menu-item">
                         <span class="mypage-menu-text">新規申込み</span>
                         <span class="mypage-menu-arrow">▶</span>
                     </a>
