@@ -22,6 +22,7 @@
         <div style="background-color: #fff; padding: 20px; border-radius: 4px; border: 1px solid #ddd; margin: 20px 0;">
             <h2 style="color: #E20000; font-size: 18px; margin-bottom: 15px;">ログイン情報</h2>
             <p style="margin-bottom: 10px;"><strong>メールアドレス:</strong> {{ $mailInfo['email'] ?? '' }}</p>
+            <p style="margin-bottom: 10px;"><strong>電話番号:</strong> {{ $mailInfo['phone'] ?? '' }}</p>
             <p style="margin-bottom: 10px;"><strong>仮パスワード:</strong> <span
                     style="font-family: monospace; font-size: 16px; background-color: #f0f0f0; padding: 5px 10px; border-radius: 4px;">{{ $mailInfo['password'] ?? '' }}</span>
             </p>
@@ -33,7 +34,7 @@
         </div>
 
         <p style="margin-top: 30px; margin-bottom: 10px;">
-            <a href="{{ route('user.login') }}"
+            <a href="{{ route('user.login', ['email' => $mailInfo['email'], 'phone' => $mailInfo['phone']]) }}"
                 style="display: inline-block; background-color: #416FED; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">ログインページへ</a>
         </p>
 

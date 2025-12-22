@@ -50,7 +50,7 @@
                                 class="text-sm text-gray-500">※半角英数字</span>
                         </div>
                         <div class="form-input-wrapper">
-                            <input type="email" name="email" id="email" class="form-input" value="{{ old('email') }}" required>
+                            <input type="email" name="email" id="email" class="form-input" value="{{ old('email', $email) }}" required>
                             <div class="form-input-error">
                                 @error('email')
                                     <p class="text-red-500">{{ $message }}</p>
@@ -64,7 +64,7 @@
                                 class="text-sm text-gray-500">※半角英数字</span>
                         </div>
                         <div class="form-input-wrapper">
-                            <input type="text" name="phone" id="phone" class="form-input" value="{{ old('phone') }}" required>
+                            <input type="text" name="phone" id="phone" class="form-input" value="{{ old('phone', $phone) }}" required>
                             <div class="form-input-error">
                                 @error('phone')
                                     <p class="text-red-500">{{ $message }}</p>

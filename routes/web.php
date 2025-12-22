@@ -37,7 +37,7 @@ Route::prefix('guest')->name('guest.')->middleware('guest')->group(function () {
 
     Route::prefix('payment')->name('payment.')->group(function () {
         Route::get('token/{token}', [UserTempUserPaymentController::class, 'index'])->name('index');
-        Route::post('token/{token}', [UserTempUserPaymentController::class, 'st ore'])->name('store');
+        Route::post('token/{token}', [UserTempUserPaymentController::class, 'store'])->name('store');
         Route::get('convenience/token/{token}', [UserTempUserPaymentController::class, 'convenience'])->name('convenience');
         Route::match(['get', 'post'], 'callback/token/{token}', [UserTempUserPaymentController::class, 'callback'])->name('callback');
         Route::get('cancel/token/{token}', [UserTempUserPaymentController::class, 'cancel'])->name('cancel');
@@ -58,7 +58,7 @@ Route::prefix('admin')->name('admin.')->middleware('guest')->group(function () {
 
 // Authenticated user routes
 Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
-    // Add authenticated user routes here
+    Route::get('dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
 });
 
 // Route::view('dashboard', 'dashboard')

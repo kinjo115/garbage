@@ -60,6 +60,9 @@ class TempUserPaymentController extends Controller
 
         $paymentMethod = $request->input('payment_method');
 
+        //make user info
+        $this->makeUserInfo($tempUser, $selected);
+
         if ($paymentMethod === 'online') {
             // GMOペイメントへのリダイレクト
             return $this->redirectToGmoPayment($tempUser, $selected);
@@ -408,64 +411,13 @@ class TempUserPaymentController extends Controller
                     throw new \Exception('ユーザー情報が見つかりませんでした。');
                 }
 
-                // 既にユーザーが作成されているかチェック
-                $user = null;
-                if ($userInfo->user_id) {
-                    $user = User::find($userInfo->user_id);
-                }
 
-                // ユーザーが存在しない場合は新規作成
-                if (!$user) {
-                    // 一時パスワードを生成（12文字、英数字記号）
-                    $temporaryPassword = Str::random(12);
-
-                    // ユーザー名を生成（姓 + 名）
-                    $userName = trim($userInfo->last_name . ' ' . $userInfo->first_name);
-
-                    // ユーザーを作成
-                    $user = User::create([
-                        'name' => $userName,
-                        'email' => $tempUser->email,
-                        'password' => Hash::make($temporaryPassword),
-                        'role' => User::ROLE['USER'],
-                    ]);
-
-                    // UserInfoをユーザーに紐付け
-                    $userInfo->user_id = $user->id;
-                    $userInfo->save();
-
-                    // SelectedItemをユーザーに紐付け
-                    $selected->user_id = $user->id;
-                    $selected->save();
-
-                    // パスワード通知メールを送信
-                    SendMessageJob::dispatch(
-                        $user->email,
-                        '会員登録が完了しました',
-                        'mails.user.auth.password_notification',
-                        [
-                            'email' => $user->email,
-                            'name' => $userName,
-                            'password' => $temporaryPassword,
-                        ]
-                    )->afterCommit();
-
-                    Log::info('User created after payment success', [
-                        'user_id' => $user->id,
-                        'email' => $user->email,
-                        'temp_user_id' => $tempUser->id,
-                    ]);
-                } else {
-                    // 既存ユーザーの場合、SelectedItemのみ紐付け
-                    $selected->user_id = $user->id;
-                    $selected->save();
-                }
 
                 DB::commit();
 
                 // 決済完了メールを送信
-                $userName = $user ? $user->name : trim(($userInfo->last_name ?? '') . ' ' . ($userInfo->first_name ?? ''));
-                $email = $user ? $user->email : $tempUser->email;
+                $userName = $tempUser->user ? $tempUser->user->name : trim(($userInfo->last_name ?? '') . ' ' . ($userInfo->first_name ?? ''));
+                $email = $tempUser->user ? $tempUser->user->email : $tempUser->email;
 
                 // 収集日のフォーマット
                 $collectionDate = $selected->collection_date
@@ -736,6 +688,119 @@ class TempUserPaymentController extends Controller
             return redirect()
                 ->route('guest.payment.index', ['token' => $tempUser->token])
                 ->with('error', '決済処理中にエラーが発生しました。もう一度お試しください。');
+        }
+    }
+
+    /**
+     * make user info
+     */
+    private function makeUserInfo($tempUser, $selected)
+    {
+        $userInfo = UserInfo::where('temp_user_id', $tempUser->id)->first();
+
+        // UserInfoが存在しない場合はエラー
+        if (!$userInfo) {
+            Log::error('UserInfo not found for temp_user', [
+                'temp_user_id' => $tempUser->id,
+                'temp_user_email' => $tempUser->email,
+            ]);
+            throw new \Exception('ユーザー情報が見つかりませんでした。');
+        }
+
+        // 既にユーザーが作成されているかチェック
+        $user = null;
+        if ($userInfo->user_id) {
+            $user = User::find($userInfo->user_id);
+        }
+
+        // user_idが設定されていてもユーザーが存在しない場合、または
+        // 同じメールアドレスのユーザーが既に存在する場合をチェック
+        if (!$user) {
+            // メールアドレスで既存ユーザーを検索
+            $existingUser = User::where('email', $tempUser->email)->first();
+
+            if ($existingUser) {
+                // 既存ユーザーが見つかった場合、それを使用
+                $user = $existingUser;
+
+                // UserInfoを既存ユーザーに紐付け（まだ紐付けられていない場合）
+                if (!$userInfo->user_id) {
+                    $userInfo->user_id = $user->id;
+                    $userInfo->save();
+                }
+            } else {
+                // 新規ユーザーを作成
+                try {
+                    DB::beginTransaction();
+
+                    // 一時パスワードを生成（12文字、英数字記号）
+                    $temporaryPassword = Str::random(12);
+
+                    // ユーザー名を生成（姓 + 名）
+                    $lastName = $userInfo->last_name ?? '';
+                    $firstName = $userInfo->first_name ?? '';
+                    $userName = trim($lastName . ' ' . $firstName);
+
+                    // ユーザー名が空の場合はメールアドレスを使用
+                    if (empty($userName)) {
+                        $userName = $tempUser->email;
+                    }
+
+                    // ユーザーを作成
+                    $user = User::create([
+                        'name' => $userName,
+                        'email' => $tempUser->email,
+                        'password' => Hash::make($temporaryPassword),
+                        'role' => User::ROLE['USER'],
+                    ]);
+
+                    // UserInfoをユーザーに紐付け
+                    $userInfo->user_id = $user->id;
+                    $userInfo->save();
+
+                    // SelectedItemをユーザーに紐付け（まだ紐付けられていない場合）
+                    if (!$selected->user_id) {
+                        $selected->user_id = $user->id;
+                        $selected->save();
+                    }
+
+                    DB::commit();
+
+                    // パスワード通知メールを送信
+                    SendMessageJob::dispatch(
+                        $user->email,
+                        '会員登録が完了しました',
+                        'mails.user.auth.password_notification',
+                        [
+                            'email' => $user->email,
+                            'name' => $userName,
+                            'phone' => $userInfo->phone_number,
+                            'password' => $temporaryPassword,
+                        ]
+                    )->afterCommit();
+
+                    Log::info('User created after payment success', [
+                        'user_id' => $user->id,
+                        'email' => $user->email,
+                        'temp_user_id' => $tempUser->id,
+                    ]);
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    Log::error('Error creating user in makeUserInfo', [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                        'temp_user_id' => $tempUser->id,
+                        'email' => $tempUser->email,
+                    ]);
+                    throw $e;
+                }
+            }
+        }
+
+        // 既存ユーザーの場合、SelectedItemのみ紐付け（まだ紐付けられていない場合）
+        if ($user && !$selected->user_id) {
+            $selected->user_id = $user->id;
+            $selected->save();
         }
     }
 }

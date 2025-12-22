@@ -14,9 +14,11 @@ use Carbon\Carbon;
 
 class AuthenticationController extends Controller
 {
-    public function create()
+    public function create(Request $request)
     {
-        return view('user.auth.login');
+        $email = $request->input('email');
+        $phone = $request->input('phone');
+        return view('user.auth.login', compact('email', 'phone'));
     }
 
     public function store(Request $request)

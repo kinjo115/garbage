@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
 
 class SelectedItem extends Model
 {
@@ -47,7 +48,7 @@ class SelectedItem extends Model
             return null;
         }
 
-        $paymentDate = \Carbon\Carbon::parse($this->payment_date);
+        $paymentDate = Carbon::parse($this->payment_date);
         $yy = $paymentDate->format('y'); // 2桁の年
         $mm = $paymentDate->format('m'); // 2桁の月
         $serial = str_pad($this->reception_number_serial, 5, '0', STR_PAD_LEFT);
