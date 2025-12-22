@@ -1,59 +1,101 @@
-<x-layouts.auth>
-    <div class="flex flex-col gap-6">
-        <x-auth-header :title="__('Log in to your account')" :description="__('Enter your email and password below to log in')" />
+@extends('layouts.app')
 
-        <!-- Session Status -->
-        <x-auth-session-status class="text-center" :status="session('status')" />
+@section('meta')
+    <title>管理画面ログイン | 名古屋市ゴミ収集サイト</title>
+    <meta name="description" content="管理画面ログイン | 名古屋市ゴミ収集サイト">
+    <meta name="keywords" content="管理画面,ログイン,名古屋市,ゴミ収集,ゴミ収集サイト">
+    <meta name="author" content="名古屋市ゴミ収集サイト">
+    <meta property="og:title" content="管理画面ログイン | 名古屋市ゴミ収集サイト">
+    <meta property="og:description" content="管理画面ログイン | 名古屋市ゴミ収集サイト">
+    <meta property="og:image" content="{{ asset('assets/images/ogp.png') }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ route('login') }}">
+    <meta property="og:locale" content="ja_JP">
+    <meta property="og:site_name" content="名古屋市ゴミ収集サイト">
+@endsection
 
-        <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-6">
-            @csrf
-
-            <!-- Email Address -->
-            <flux:input
-                name="email"
-                :label="__('Email address')"
-                :value="old('email')"
-                type="email"
-                required
-                autofocus
-                autocomplete="email"
-                placeholder="email@example.com"
-            />
-
-            <!-- Password -->
-            <div class="relative">
-                <flux:input
-                    name="password"
-                    :label="__('Password')"
-                    type="password"
-                    required
-                    autocomplete="current-password"
-                    :placeholder="__('Password')"
-                    viewable
-                />
-
-                @if (Route::has('password.request'))
-                    <flux:link class="absolute top-0 text-sm end-0" :href="route('password.request')" wire:navigate>
-                        {{ __('Forgot your password?') }}
-                    </flux:link>
-                @endif
+@section('content')
+    <div class="c-page">
+        <div class="c-container">
+            <div class="breadcrumbs">
+                <div class="breadcrumbs-item">
+                    <a href="{{ route('home') }}">ホーム</a>
+                </div>
+                <div class="breadcrumbs-item">
+                    <span>管理画面ログイン</span>
+                </div>
             </div>
+            <div class="page-content form-content">
+                <div class="page-header">
+                    <h1 class="page-title">管理画面ログイン</h1>
+                </div>
+                <div class="form-description text-center">
+                    <p class="text-E20000">管理者のみアクセス可能です</p>
+                    <br>
+                    <p>メールアドレスとパスワードを入力してログインしてください。</p>
+                </div>
+                <form method="POST" action="{{ route('login') }}" class="mt-16 max-w-md mx-auto">
+                    @csrf
 
-            <!-- Remember Me -->
-            <flux:checkbox name="remember" :label="__('Remember me')" :checked="old('remember')" />
+                    @if(session('status'))
+                        <div class="form-input-error mb-4 p-4 bg-green-50 border border-green-200 rounded-md">
+                            <p class="text-green-600 text-sm font-medium">{{ session('status') }}</p>
+                        </div>
+                    @endif
 
-            <div class="flex items-center justify-end">
-                <flux:button variant="primary" type="submit" class="w-full" data-test="login-button">
-                    {{ __('Log in') }}
-                </flux:button>
+                    @if($errors->any())
+                        <div class="form-input-error mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+                            @foreach($errors->all() as $error)
+                                <p class="text-red-600 text-sm font-medium">{{ $error }}</p>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <!-- Email Address -->
+                    <div class="form-group">
+                        <div class="flex items-center gap-10">
+                            <label for="email" class="form-label required">メールアドレス</label>
+                            <span class="text-sm text-gray-500">※半角英数字</span>
+                        </div>
+                        <div class="form-input-wrapper">
+                            <input type="email" name="email" id="email" class="form-input" value="{{ old('email') }}" required autofocus autocomplete="email" placeholder="email@example.com">
+                            <div class="form-input-error">
+                                @error('email')
+                                    <p class="text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+                        <div class="flex items-center gap-10">
+                            <label for="password" class="form-label required">パスワード</label>
+                            <span class="text-sm text-gray-500">※半角英数字</span>
+                        </div>
+                        <div class="form-input-wrapper">
+                            <input type="password" name="password" id="password" class="form-input" required autocomplete="current-password" placeholder="パスワード">
+                            <div class="form-input-error">
+                                @error('password')
+                                    <p class="text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Remember Me -->
+                    <div class="form-group">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="remember" class="mr-2" {{ old('remember') ? 'checked' : '' }}>
+                            <span class="text-sm text-gray-600">ログイン状態を保持する</span>
+                        </label>
+                    </div>
+
+                    <div class="form-submit">
+                        <button type="submit" class="c-button btn-416FED">ログイン</button>
+                    </div>
+                </form>
             </div>
-        </form>
-
-        @if (Route::has('register'))
-            <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
-                <span>{{ __('Don\'t have an account?') }}</span>
-                <flux:link :href="route('register')" wire:navigate>{{ __('Sign up') }}</flux:link>
-            </div>
-        @endif
+        </div>
     </div>
-</x-layouts.auth>
+@endsection

@@ -70,6 +70,26 @@ Route::prefix('admin')->name('admin.')->middleware('guest')->group(function () {
     // Fortify will handle these routes at /admin/login
 });
 
+// Authenticated admin routes
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('index');
+        Route::get('/{id}', [App\Http\Controllers\Admin\UserController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [App\Http\Controllers\Admin\UserController::class, 'edit'])->name('edit');
+        Route::post('/{id}', [App\Http\Controllers\Admin\UserController::class, 'update'])->name('update');
+        Route::post('/{id}/delete', [App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::prefix('applications')->name('applications.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\ApplicationController::class, 'index'])->name('index');
+        Route::get('/{id}', [App\Http\Controllers\Admin\ApplicationController::class, 'show'])->name('show');
+        Route::post('/{id}/cancel', [App\Http\Controllers\Admin\ApplicationController::class, 'cancel'])->name('cancel');
+        Route::post('/{id}/status', [App\Http\Controllers\Admin\ApplicationController::class, 'updateStatus'])->name('update-status');
+    });
+});
+
 // Authenticated user routes
 Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
     Route::get('mypage', [UserDashboardController::class, 'index'])->name('mypage');
