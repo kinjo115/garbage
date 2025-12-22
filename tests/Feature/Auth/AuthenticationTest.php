@@ -13,7 +13,7 @@ class AuthenticationTest extends TestCase
 
     public function test_login_screen_can_be_rendered(): void
     {
-        $response = $this->get(route('login'));
+        $response = $this->get(route('user.login'));
 
         $response->assertStatus(200);
     }
@@ -22,14 +22,14 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->withoutTwoFactor()->create();
 
-        $response = $this->post(route('login.store'), [
+        $response = $this->post(route('user.login.store'), [
             'email' => $user->email,
             'password' => 'password',
         ]);
 
         $response
             ->assertSessionHasNoErrors()
-            ->assertRedirect(route('dashboard', absolute: false));
+            ->assertRedirect(route('user.mypage', absolute: false));
 
         $this->assertAuthenticated();
     }
@@ -38,7 +38,7 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->post(route('login.store'), [
+        $response = $this->post(route('user.login.store'), [
             'email' => $user->email,
             'password' => 'wrong-password',
         ]);
@@ -60,7 +60,7 @@ class AuthenticationTest extends TestCase
 
         $user = User::factory()->create();
 
-        $response = $this->post(route('login.store'), [
+        $response = $this->post(route('user.login.store'), [
             'email' => $user->email,
             'password' => 'password',
         ]);
@@ -73,7 +73,7 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->post(route('logout'));
+        $response = $this->actingAs($user)->post(route('user.logout'));
 
         $response->assertRedirect(route('home'));
         $this->assertGuest();

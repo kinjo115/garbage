@@ -19,7 +19,7 @@ class TwoFactorChallengeTest extends TestCase
 
         $response = $this->get(route('two-factor.login'));
 
-        $response->assertRedirect(route('login'));
+        $response->assertRedirect(route('user.login'));
     }
 
     public function test_two_factor_challenge_can_be_rendered(): void
@@ -35,7 +35,7 @@ class TwoFactorChallengeTest extends TestCase
 
         $user = User::factory()->create();
 
-        $this->post(route('login.store'), [
+        $this->post(route('user.login.store'), [
             'email' => $user->email,
             'password' => 'password',
         ])->assertRedirect(route('two-factor.login'));

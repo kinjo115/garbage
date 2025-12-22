@@ -118,7 +118,7 @@
                             <a href="{{ route('user.history.index') }}"
                                 class="c-btn-black">戻る</a>
                         @else
-                            <a href="{{ route('user.info.map') }}"
+                            <a href="{{ route('user.mypage') }}"
                                 class="c-btn-black">戻る</a>
                         @endif
                     </div>
