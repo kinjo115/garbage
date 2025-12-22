@@ -142,12 +142,15 @@ class UserPaymentController extends Controller
                 'ShopPass' => $config['shop_pass'],
                 'GuideMailSendFlag' => '1',
                 'SendMailAddress' => $user->email,
+                'TemplateNo' => 1,
             ];
 
             // 顧客名がある場合は追加
             if (!empty($customerName)) {
                 $getUrlParam['CustomerName'] = $customerName;
             }
+
+            // TemplateNo（テンプレート番号）を設定
 
             // JSON構造に従ったリクエストボディ
             $requestBody = [

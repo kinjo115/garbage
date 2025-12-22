@@ -142,15 +142,13 @@ class TempUserPaymentController extends Controller
                 'ShopPass' => $config['shop_pass'],
                 'GuideMailSendFlag' => '1',
                 'SendMailAddress' => $tempUser->email,
+                'TemplateNo' => 1,
             ];
 
             // 顧客名がある場合は追加
             if (!empty($customerName)) {
                 $getUrlParam['CustomerName'] = $customerName;
             }
-
-            // TemplateNo（テンプレート番号）は必要に応じて追加可能
-            // $getUrlParam['TemplateNo'] = '1';
 
             // 本人認証質問（必要に応じて追加可能）
             // $getUrlParam['AuthenticationQuestion1'] = '質問';
@@ -159,7 +157,7 @@ class TempUserPaymentController extends Controller
             // JSON構造に従ったリクエストボディ
             $requestBody = [
                 'geturlparam' => $getUrlParam,
-                'configid' => $config['config_id'] ?? '001',
+                'configid' => 'theta',
                 'transaction' => [
                     'OrderID' => $orderId,
                     'Amount' => (string)$amount,
@@ -174,7 +172,7 @@ class TempUserPaymentController extends Controller
             $logData = $requestBody;
             $logData['geturlparam']['ShopPass'] = '***'; // パスワードをマスク
             Log::info('GMO GetLinkplusUrl Request', [
-                'configid' => $requestBody['configid'],
+                'configid' => 'theta',
                 'OrderID' => $orderId,
                 'OrderID_length' => strlen($orderId),
                 'Amount' => $amount,
