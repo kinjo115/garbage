@@ -274,13 +274,9 @@ class TempUserPaymentController extends Controller
             }
 
             // StartURLを取得（JSONまたはテキスト形式に対応）
-            $startUrl = $result['StartURL'] ?? ($result['startURL'] ?? ($result['starturl'] ?? null));
+            $startUrl = $result['LinkUrl'] ?? ($result['LinkUrl'] ?? ($result['LinkUrl'] ?? null));
 
             if (!$startUrl) {
-                Log::error('GMO GetLinkplusUrl Missing StartURL', [
-                    'Response' => $response->body(),
-                    'Parsed' => $result,
-                ]);
 
                 return redirect()
                     ->route('guest.payment.index', ['token' => $tempUser->token])
@@ -290,11 +286,6 @@ class TempUserPaymentController extends Controller
             // GMO決済画面へリダイレクト
             return redirect($startUrl);
         } catch (\Exception $e) {
-            Log::error('GMO Payment Exception', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'OrderID' => $orderId,
-            ]);
 
             return redirect()
                 ->route('guest.payment.index', ['token' => $tempUser->token])

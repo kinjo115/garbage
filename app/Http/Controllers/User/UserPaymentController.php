@@ -260,7 +260,7 @@ class UserPaymentController extends Controller
             }
 
             // StartURLを取得
-            $startUrl = $result['StartURL'] ?? ($result['startURL'] ?? ($result['starturl'] ?? null));
+            $startUrl = $result['LinkUrl'] ?? ($result['LinkUrl'] ?? ($result['LinkUrl'] ?? null));
 
             if (!$startUrl) {
                 Log::error('GMO GetLinkplusUrl Missing StartURL (Authenticated User)', [
