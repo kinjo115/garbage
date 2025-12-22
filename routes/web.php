@@ -58,6 +58,11 @@ Route::prefix('guest')->name('guest.')->middleware('guest')->group(function () {
 Route::prefix('user')->name('user.')->middleware('guest')->group(function () {
     Route::get('login', [UserAuthenticationController::class, 'create'])->name('login');
     Route::post('login', [UserAuthenticationController::class, 'store'])->name('login.store');
+
+    Route::get('forgot-password', [UserAuthenticationController::class, 'createForgotPassword'])->name('forgot-password');
+    Route::post('forgot-password', [UserAuthenticationController::class, 'storeForgotPassword'])->name('forgot-password.store');
+    Route::get('reset-password/{token}', [UserAuthenticationController::class, 'createResetPassword'])->name('reset-password');
+    Route::post('reset-password/{token}', [UserAuthenticationController::class, 'storeResetPassword'])->name('reset-password.store');
 });
 
 // Admin routes using Fortify (only for admin users)

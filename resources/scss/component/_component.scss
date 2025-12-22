@@ -30,6 +30,10 @@
         opacity: 0.5;
         cursor: not-allowed;
     }
+
+    &.text-sm {
+        font-size: 18px;
+    }
 }
 
 .breadcrumbs {
