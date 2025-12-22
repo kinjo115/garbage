@@ -57,7 +57,7 @@
                         <span class="mypage-menu-arrow">▶</span>
                     </a>
 
-                    <a href="#" class="mypage-menu-item">
+                    <a href="{{ route('user.withdraw.edit') }}" class="mypage-menu-item">
                         <span class="mypage-menu-text">退会する</span>
                         <span class="mypage-menu-arrow">▶</span>
                     </a>

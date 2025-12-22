@@ -133,7 +133,7 @@
             // 既存申込みの場合、品目変更を検知してボタンを有効/無効化
             const $itemsForm = $('#items-form');
             const $submitBtn = $('#submit-btn');
-            
+
             // 初期選択データを保存
             let initialSelectedItems = [];
             const initialItemsAttr = $itemsForm.attr('data-initial-items');
@@ -155,15 +155,18 @@
 
             // 現在の選択データと初期データを比較
             function checkItemsChanged() {
-                if (initialSelectedItems.length === 0 && selectedItems.length === 0) {
+                // app.jsのselectedItemsを取得
+                const currentSelectedItems = window.selectedItems || [];
+
+                if (initialSelectedItems.length === 0 && currentSelectedItems.length === 0) {
                     return false;
                 }
 
-                if (initialSelectedItems.length !== selectedItems.length) {
+                if (initialSelectedItems.length !== currentSelectedItems.length) {
                     return true;
                 }
 
-                const currentItems = selectedItems.map(function(item) {
+                const currentItems = currentSelectedItems.map(function(item) {
                     return {
                         id: item.id,
                         quantity: item.quantity,
@@ -181,7 +184,8 @@
             // ボタンの有効/無効を更新
             function updateSubmitButton() {
                 const hasChanged = checkItemsChanged();
-                const hasItems = selectedItems.length > 0;
+                const currentSelectedItems = window.selectedItems || [];
+                const hasItems = currentSelectedItems.length > 0;
                 const isCancelled = {{ isset($selectedItem) && $selectedItem->confirm_status === \App\Models\SelectedItem::CONFIRM_STATUS_CANCELLED ? 'true' : 'false' }};
 
                 if (isCancelled || !hasItems || !hasChanged) {

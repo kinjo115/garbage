@@ -198,6 +198,175 @@
     }
 }
 
+// Withdraw Page Styles
+.withdraw-content {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 40px 0;
+    text-align: center;
+}
+
+.withdraw-description {
+    margin-bottom: 40px;
+
+    p {
+        font-size: 16px;
+        line-height: 1.7;
+        color: #000;
+        font-family: "Noto Sans JP", sans-serif;
+        margin-bottom: 8px;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.withdraw-confirmation {
+    margin-bottom: 40px;
+
+    p {
+        font-size: 16px;
+        line-height: 1.7;
+        color: #000;
+        font-family: "Noto Sans JP", sans-serif;
+    }
+}
+
+.withdraw-submit {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.withdraw-error {
+    margin-bottom: 40px;
+    padding: 20px;
+    background-color: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    text-align: center;
+
+    .withdraw-error-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #856404;
+        margin-bottom: 8px;
+        font-family: "Noto Sans JP", sans-serif;
+    }
+
+    .withdraw-error-message {
+        font-size: 16px;
+        color: #856404;
+        line-height: 1.7;
+        font-family: "Noto Sans JP", sans-serif;
+    }
+}
+
+.withdraw-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    height: 60px;
+    background-color: #1F1F1F;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-family: "Noto Sans JP", sans-serif;
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+        background-color: #333;
+        opacity: 0.9;
+    }
+
+    &:disabled {
+        background-color: #999;
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+// Withdraw Modal Styles
+.withdraw-modal-content {
+    max-width: 500px;
+    width: 90%;
+    padding: 40px 30px;
+    text-align: center;
+}
+
+.withdraw-modal-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+}
+
+.withdraw-modal-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #416FED;
+    font-family: "Noto Sans JP", sans-serif;
+    margin: 0;
+}
+
+.withdraw-modal-description {
+    font-size: 16px;
+    color: #505050;
+    font-family: "Noto Sans JP", sans-serif;
+    margin: 0;
+    line-height: 1.7;
+}
+
+.withdraw-modal-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.withdraw-modal-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 60px;
+    font-size: 18px;
+    font-weight: 600;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-family: "Noto Sans JP", sans-serif;
+    transition: all 0.3s ease;
+    color: #fff;
+
+    &.withdraw-modal-button-confirm {
+        background-color: #416FED;
+        border: 2px solid #416FED;
+
+        &:hover {
+            background-color: #3159d4;
+            border-color: #3159d4;
+        }
+    }
+
+    &.withdraw-modal-button-cancel {
+        background-color: #FF6B35;
+        border: 2px solid #FF6B35;
+
+        &:hover {
+            background-color: #e55a2b;
+            border-color: #e55a2b;
+        }
+    }
+}
+
 // History Page Styles
 .history-content {
     max-width: 800px;

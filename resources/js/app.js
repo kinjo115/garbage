@@ -383,6 +383,8 @@ $(document).ready(function() {
     const $itemsForm = $('#items-form');
     if ($itemsForm.length) {
         let selectedItems = [];
+        // グローバルに公開（既存申込みの変更検知用）
+        window.selectedItems = selectedItems;
 
         // 初期選択データがあれば読み込む（selected_items テーブルから）
         const initialItemsAttr = $itemsForm.attr('data-initial-items');
@@ -395,14 +397,17 @@ $(document).ready(function() {
                             id: item.id,
                             name: item.name,
                             price: item.price,
-                            quantity: item.quantity,
-                        };
-                    });
-                }
-            } catch (e) {
-                console.warn('初期品目データのパースに失敗しました', e);
+                        quantity: item.quantity,
+                    };
+                });
             }
+        } catch (e) {
+            console.warn('初期品目データのパースに失敗しました', e);
         }
+
+        // グローバル変数を更新
+        window.selectedItems = selectedItems;
+    }
 
         const $selectedWrapper = $('#selected-items-wrapper');
         const $totalAmount = $('#total-content-amount');
@@ -451,6 +456,12 @@ $(document).ready(function() {
             });
 
             $totalAmount.html(`${totalPrice.toLocaleString()}円 <span class="text-sm">(${totalCount}個)</span>`);
+
+            // グローバルにrenderSelectedItemsを公開（既存申込みの変更検知用）
+            window.renderSelectedItems = renderSelectedItems;
+
+            // 品目変更イベントを発火
+            $(document).trigger('itemChanged');
         }
 
         /**
@@ -508,6 +519,7 @@ $(document).ready(function() {
             if (!target) return;
 
             target.quantity += 1;
+            window.selectedItems = selectedItems;
             renderSelectedItems();
         });
 
@@ -526,6 +538,7 @@ $(document).ready(function() {
                 // 1未満にはしない（削除はゴミ箱ボタンで）
                 return;
             }
+            window.selectedItems = selectedItems;
             renderSelectedItems();
         });
 
@@ -540,6 +553,7 @@ $(document).ready(function() {
                 return i.id !== id;
             });
 
+            window.selectedItems = selectedItems;
             renderSelectedItems();
         });
 
