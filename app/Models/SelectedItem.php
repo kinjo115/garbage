@@ -40,6 +40,16 @@ class SelectedItem extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function paymentHistories()
+    {
+        return $this->hasMany(PaymentHistory::class);
+    }
+
+    public function latestPaymentHistory()
+    {
+        return $this->hasOne(PaymentHistory::class)->latestOfMany();
+    }
+
     /**
      * 受付番号を取得（YYMM-00001形式）
      */

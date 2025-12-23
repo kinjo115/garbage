@@ -48,7 +48,6 @@ Route::prefix('guest')->name('guest.')->middleware('guest')->group(function () {
         Route::get('token/{token}', [UserTempUserPaymentController::class, 'index'])->name('index');
         Route::post('token/{token}', [UserTempUserPaymentController::class, 'store'])->name('store');
         Route::get('convenience/token/{token}', [UserTempUserPaymentController::class, 'convenience'])->name('convenience');
-        Route::match(['get', 'post'], 'callback/token/{token}', [UserTempUserPaymentController::class, 'callback'])->name('callback');
         Route::get('cancel/token/{token}', [UserTempUserPaymentController::class, 'cancel'])->name('cancel');
         Route::get('complete/token/{token}', [UserTempUserPaymentController::class, 'complete'])->name('complete');
     });
@@ -141,7 +140,6 @@ Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
         Route::get('{id}', [UserPaymentController::class, 'index'])->name('index');
         Route::post('{id}', [UserPaymentController::class, 'store'])->name('store');
         Route::get('convenience/{id}', [UserPaymentController::class, 'convenience'])->name('convenience');
-        Route::match(['get', 'post'], 'callback/{id}', [UserPaymentController::class, 'callback'])->name('callback');
         Route::get('cancel/{id}', [UserPaymentController::class, 'cancel'])->name('cancel');
         Route::get('complete/{id}', [UserPaymentController::class, 'complete'])->name('complete');
     });
