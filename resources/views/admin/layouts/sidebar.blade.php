@@ -23,6 +23,10 @@
             <span class="admin-sidebar-icon">🏷️</span>
             <span class="admin-sidebar-text">カテゴリー管理</span>
         </a>
+        <a href="{{ route('admin.payment-histories.index') }}" class="admin-sidebar-item {{ request()->routeIs('admin.payment-histories.*') ? 'active' : '' }}">
+            <span class="admin-sidebar-icon">💳</span>
+            <span class="admin-sidebar-text">決済履歴</span>
+        </a>
         <div class="admin-sidebar-divider"></div>
         <form method="POST" action="{{ route('logout') }}" id="admin-logout-form" class="admin-sidebar-logout">
             @csrf

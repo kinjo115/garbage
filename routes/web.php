@@ -106,6 +106,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::put('/{id}', [App\Http\Controllers\Admin\ItemCategoryController::class, 'update'])->name('update');
         Route::delete('/{id}', [App\Http\Controllers\Admin\ItemCategoryController::class, 'destroy'])->name('destroy');
     });
+
+    Route::prefix('payment-histories')->name('payment-histories.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\PaymentHistoryController::class, 'index'])->name('index');
+        Route::get('/{id}', [App\Http\Controllers\Admin\PaymentHistoryController::class, 'show'])->name('show');
+    });
 });
 
 // Authenticated user routes
