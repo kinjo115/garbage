@@ -66,28 +66,48 @@ class GmoPaymentController extends Controller
 
         DB::beginTransaction();
         try {
-            // PaymentHistoryを作成
-            $paymentHistory = PaymentHistory::create([
-                'selected_item_id' => $selected->id,
-                'shop_id' => $request->input('ShopID'),
-                'access_id' => $accessId,
-                'order_id' => $orderId,
-                'status' => $status,
-                'job_cd' => $jobCd,
-                'amount' => $amount ? (int)$amount : null,
-                'tax' => $request->input('Tax') ? (int)$request->input('Tax') : null,
-                'currency' => $request->input('Currency', 'JPN'),
-                'forward' => $request->input('Forward'),
-                'method' => $request->input('Method'),
-                'pay_times' => $request->input('PayTimes') ? (int)$request->input('PayTimes') : null,
-                'tran_id' => $tranId,
-                'approve' => $approve,
-                'tran_date' => $tranDate,
-                'err_code' => $errCode,
-                'err_info' => $errInfo,
-                'pay_type' => $request->input('PayType'),
-                'raw_response' => $request->all(),
-            ]);
+            // 同じOrderIDで既にPaymentHistoryが存在するかチェック（重複防止）
+            $existingPaymentHistory = PaymentHistory::where('order_id', $orderId)
+                ->where('selected_item_id', $selected->id)
+                ->first();
+
+            if ($existingPaymentHistory) {
+                Log::info('GMO Callback: PaymentHistory already exists', [
+                    'OrderID' => $orderId,
+                    'selected_item_id' => $selected->id,
+                    'payment_history_id' => $existingPaymentHistory->id,
+                ]);
+                $paymentHistory = $existingPaymentHistory;
+            } else {
+                // PaymentHistoryを作成
+                $paymentHistory = PaymentHistory::create([
+                    'selected_item_id' => $selected->id,
+                    'shop_id' => $request->input('ShopID'),
+                    'access_id' => $accessId,
+                    'order_id' => $orderId,
+                    'status' => $status,
+                    'job_cd' => $jobCd,
+                    'amount' => $amount ? (int)$amount : null,
+                    'tax' => $request->input('Tax') ? (int)$request->input('Tax') : null,
+                    'currency' => $request->input('Currency', 'JPN'),
+                    'forward' => $request->input('Forward'),
+                    'method' => $request->input('Method'),
+                    'pay_times' => $request->input('PayTimes') ? (int)$request->input('PayTimes') : null,
+                    'tran_id' => $tranId,
+                    'approve' => $approve,
+                    'tran_date' => $tranDate,
+                    'err_code' => $errCode,
+                    'err_info' => $errInfo,
+                    'pay_type' => $request->input('PayType'),
+                    'raw_response' => $request->all(),
+                ]);
+
+                Log::info('GMO Callback: PaymentHistory created', [
+                    'OrderID' => $orderId,
+                    'selected_item_id' => $selected->id,
+                    'payment_history_id' => $paymentHistory->id,
+                ]);
+            }
 
             // エラーがある場合
             if (!empty($errCode)) {
@@ -112,11 +132,23 @@ class GmoPaymentController extends Controller
 
             // 決済成功の判定
             if ($status === 'CAPTURE' || $status === 'AUTH') {
+                // tempUserが存在する場合、ユーザーを作成（既に決済が完了している場合でも）
+                $tempUser = $selected->tempUser;
+                $user = $selected->user;
+
+                if ($tempUser && !$user) {
+                    // tempUserからユーザーを作成
+                    $user = $this->makeUserFromTempUser($tempUser, $selected);
+                    // ユーザー作成後、selectedを再取得（user_idが更新されている可能性があるため）
+                    $selected->refresh();
+                }
+
                 // 既に決済が完了している場合は重複処理を防ぐ
                 if ($selected->payment_status === 2 && $selected->payment_date) {
                     Log::info('GMO Callback: Payment already processed', [
                         'OrderID' => $orderId,
                         'selected_item_id' => $selected->id,
+                        'user_id' => $selected->user_id,
                     ]);
 
                     DB::commit();
@@ -132,15 +164,6 @@ class GmoPaymentController extends Controller
                     $selectedId = (string)$selected->id;
                     $last5Digits = substr($selectedId, -5);
                     $selected->reception_number_serial = str_pad($last5Digits, 5, '0', STR_PAD_LEFT);
-                }
-
-                // tempUserが存在する場合、ユーザーを作成
-                $tempUser = $selected->tempUser;
-                $user = $selected->user;
-
-                if ($tempUser && !$user) {
-                    // tempUserからユーザーを作成
-                    $user = $this->makeUserFromTempUser($tempUser, $selected);
                 }
 
                 $selected->save();
@@ -292,6 +315,11 @@ class GmoPaymentController extends Controller
                     $userInfo->user_id = $user->id;
                     $userInfo->save();
                 }
+
+                // SelectedItemをユーザーに紐付け（まだ紐付けられていない場合）
+                if (!$selected->user_id) {
+                    $selected->user_id = $user->id;
+                }
             } else {
                 // 新規ユーザーを作成
                 try {
@@ -357,9 +385,21 @@ class GmoPaymentController extends Controller
         }
 
         // 既存ユーザーの場合、SelectedItemのみ紐付け（まだ紐付けられていない場合）
+        // 注意: この処理は既に上記で実行されているため、ここでは確認のみ
         if ($user && !$selected->user_id) {
             $selected->user_id = $user->id;
+            Log::warning('SelectedItem user_id was not set in makeUserFromTempUser', [
+                'selected_item_id' => $selected->id,
+                'user_id' => $user->id,
+            ]);
         }
+
+        Log::info('makeUserFromTempUser completed', [
+            'temp_user_id' => $tempUser->id,
+            'user_id' => $user ? $user->id : null,
+            'selected_item_id' => $selected->id,
+            'selected_user_id' => $selected->user_id,
+        ]);
 
         return $user;
     }

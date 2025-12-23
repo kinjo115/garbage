@@ -342,11 +342,17 @@ class UserPaymentController extends Controller
             ->where('user_id', $user->id)
             ->firstOrFail();
 
+        if ($selected->payment_status !== 2) {
+            return redirect()
+                ->route('user.payment.index', ['id' => $id])
+                ->with('error', '決済情報が見つかりませんでした。');
+        }
 
         // TempUser形式で渡す（ブレードの互換性のため）
         $tempUser = (object)[
             'token' => null,
             'email' => $user->email,
+            'userInfo' => $user->userInfo,
         ];
 
         return view('user.temp_user.payment.complete', compact('tempUser', 'selected', 'user'));

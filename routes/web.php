@@ -49,7 +49,7 @@ Route::prefix('guest')->name('guest.')->middleware('guest')->group(function () {
         Route::post('token/{token}', [UserTempUserPaymentController::class, 'store'])->name('store');
         Route::get('convenience/token/{token}', [UserTempUserPaymentController::class, 'convenience'])->name('convenience');
         Route::get('cancel/token/{token}', [UserTempUserPaymentController::class, 'cancel'])->name('cancel');
-        Route::get('complete/token/{token}', [UserTempUserPaymentController::class, 'complete'])->name('complete');
+        Route::match(['get', 'post'], 'complete/token/{token}', [UserTempUserPaymentController::class, 'complete'])->name('complete');
     });
 });
 
@@ -141,7 +141,7 @@ Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
         Route::post('{id}', [UserPaymentController::class, 'store'])->name('store');
         Route::get('convenience/{id}', [UserPaymentController::class, 'convenience'])->name('convenience');
         Route::get('cancel/{id}', [UserPaymentController::class, 'cancel'])->name('cancel');
-        Route::get('complete/{id}', [UserPaymentController::class, 'complete'])->name('complete');
+        Route::match(['get', 'post'], 'complete/{id}', [UserPaymentController::class, 'complete'])->name('complete');
     });
 
     Route::prefix('password')->name('password.')->group(function () {

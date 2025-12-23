@@ -355,6 +355,18 @@ class TempUserPaymentController extends Controller
 
         $user = User::find($selected->user_id);
 
+        // tempUserにuserInfoを追加（ブレードの互換性のため）
+        // まずuser_idから取得を試みる
+        $userInfo = null;
+        if ($user) {
+            $userInfo = $user->userInfo;
+        }
+        // userInfoが見つからない場合、temp_user_idから取得
+        if (!$userInfo) {
+            $userInfo = UserInfo::where('temp_user_id', $tempUser->id)->first();
+        }
+        $tempUser->userInfo = $userInfo;
+
         return view('user.temp_user.payment.complete', compact('tempUser', 'selected', 'user'));
     }
 
