@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // CSRF exemption for payment callbacks (external payment gateway)
         $middleware->validateCsrfTokens(except: [
             'guest/payment/callback/token/*',
+            'user/payment/callback/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

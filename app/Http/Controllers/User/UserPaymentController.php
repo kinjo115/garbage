@@ -164,6 +164,10 @@ class UserPaymentController extends Controller
                 'credit' => [
                     'JobCd' => 'CAPTURE', // AUTH=仮売上, CAPTURE=即時決済
                 ],
+                'redirectparam' => [
+                    'RetURL' => route('user.payment.callback', ['id' => $selected->id]),
+                    'CancelURL' => route('user.payment.cancel', ['id' => $selected->id]),
+                ],
             ];
 
             // デバッグ用ログ（パスワードはマスク）
@@ -294,11 +298,34 @@ class UserPaymentController extends Controller
      */
     public function callback(Request $request, $id)
     {
-        $user = Auth::user();
+        // コールバック受信をログに記録
+        Log::info('GMO Callback Received (Authenticated User)', [
+            'id' => $id,
+            'method' => $request->method(),
+            'all_params' => $request->all(),
+            'query_params' => $request->query(),
+            'post_params' => $request->post(),
+            'headers' => $request->headers->all(),
+        ]);
 
+        // GMOからのコールバックは認証なしで呼ばれるため、SelectedItemからユーザーを取得
         $selected = SelectedItem::where('id', $id)
-            ->where('user_id', $user->id)
+            ->whereNotNull('user_id')
             ->firstOrFail();
+
+        $user = User::find($selected->user_id);
+        
+        if (!$user) {
+            Log::error('GMO Callback: User not found for SelectedItem', [
+                'id' => $id,
+                'selected_item_id' => $selected->id,
+                'user_id' => $selected->user_id,
+            ]);
+            
+            return redirect()
+                ->route('home')
+                ->with('error', 'ユーザー情報が見つかりませんでした。');
+        }
 
         // GMOペイメントからのレスポンスを確認
         $orderId = $request->input('OrderID');
