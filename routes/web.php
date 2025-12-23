@@ -88,6 +88,25 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('/{id}/cancel', [App\Http\Controllers\Admin\ApplicationController::class, 'cancel'])->name('cancel');
         Route::post('/{id}/status', [App\Http\Controllers\Admin\ApplicationController::class, 'updateStatus'])->name('update-status');
     });
+
+    Route::prefix('items')->name('items.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\ItemController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\Admin\ItemController::class, 'create'])->name('create');
+        Route::post('/', [App\Http\Controllers\Admin\ItemController::class, 'store'])->name('store');
+        Route::post('/update-order', [App\Http\Controllers\Admin\ItemController::class, 'updateOrder'])->name('update-order');
+        Route::get('/{id}/edit', [App\Http\Controllers\Admin\ItemController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [App\Http\Controllers\Admin\ItemController::class, 'update'])->name('update');
+        Route::delete('/{id}', [App\Http\Controllers\Admin\ItemController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::prefix('item-categories')->name('item-categories.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\ItemCategoryController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\Admin\ItemCategoryController::class, 'create'])->name('create');
+        Route::post('/', [App\Http\Controllers\Admin\ItemCategoryController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [App\Http\Controllers\Admin\ItemCategoryController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [App\Http\Controllers\Admin\ItemCategoryController::class, 'update'])->name('update');
+        Route::delete('/{id}', [App\Http\Controllers\Admin\ItemCategoryController::class, 'destroy'])->name('destroy');
+    });
 });
 
 // Authenticated user routes

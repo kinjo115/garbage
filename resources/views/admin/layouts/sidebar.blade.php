@@ -15,6 +15,14 @@
             <span class="admin-sidebar-icon">📋</span>
             <span class="admin-sidebar-text">申込み管理</span>
         </a>
+        <a href="{{ route('admin.items.index') }}" class="admin-sidebar-item {{ request()->routeIs('admin.items.*') ? 'active' : '' }}">
+            <span class="admin-sidebar-icon">📦</span>
+            <span class="admin-sidebar-text">品目管理</span>
+        </a>
+        <a href="{{ route('admin.item-categories.index') }}" class="admin-sidebar-item {{ request()->routeIs('admin.item-categories.*') ? 'active' : '' }}">
+            <span class="admin-sidebar-icon">🏷️</span>
+            <span class="admin-sidebar-text">カテゴリー管理</span>
+        </a>
         <div class="admin-sidebar-divider"></div>
         <form method="POST" action="{{ route('logout') }}" id="admin-logout-form" class="admin-sidebar-logout">
             @csrf
