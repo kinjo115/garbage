@@ -166,10 +166,6 @@ class TempUserPaymentController extends Controller
                 'credit' => [
                     'JobCd' => 'CAPTURE', // AUTH=仮売上, CAPTURE=即時決済
                 ],
-                'redirectparam' => [
-                    'RetURL' => route('guest.payment.callback', ['token' => $tempUser->token]),
-                    'CancelURL' => route('guest.payment.cancel', ['token' => $tempUser->token]),
-                ],
             ];
 
             // デバッグ用ログ（パスワードはマスク）
@@ -302,16 +298,6 @@ class TempUserPaymentController extends Controller
      */
     public function callback(Request $request, $token)
     {
-        // コールバック受信をログに記録
-        Log::info('GMO Callback Received (TempUser)', [
-            'token' => $token,
-            'method' => $request->method(),
-            'all_params' => $request->all(),
-            'query_params' => $request->query(),
-            'post_params' => $request->post(),
-            'headers' => $request->headers->all(),
-        ]);
-
         $tempUser = TempUser::where('token', $token)->firstOrFail();
 
         // GMOペイメントからのレスポンスを確認
